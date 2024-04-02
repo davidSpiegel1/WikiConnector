@@ -1,0 +1,4 @@
+/Users/davidspiegel/wxWidgets-3.2.4/build-cocoa-debug/wx-config
+
+And How to Make it: make -f myMake
+And How to Clean it: make -f myMake clean

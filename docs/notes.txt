@@ -1,0 +1,11 @@
+* We have the app connected to the dashboard.
+* Front page to have random wiki facts.
+******
+* Must have bluetooth (Give packets of data between two computers - Share ability)
+* Must have 'Connectors' finally there.
+
+
+
+
+
+
