@@ -4,14 +4,6 @@ import sys
 from Entry import *
 
 
-
-# https://en.wikipedia.org/w/api.php <-- For english wiki
-# 
-#response = requests.get("https://en.wikipedia.org/w/api.php?action=query&prop=info&"+
- #                       "srsearch=Craig%20Noone&"+
- #                       "titles=Earth"+
- #                       "&format=json")
-
 def search( message ):
     
     print("Searching message: ",message)
@@ -19,9 +11,6 @@ def search( message ):
     response = requests.get("https://en.wikipedia.org/w/api.php?action=query&format=json&list=search&formatversion=2&srsearch="+message)
 
 
-    #print(response.status_code)
-    #print(response.content)
-    #print(response.apparent_encoding)
     if response.status_code == 200:
         j = response.json()
         #print("Search Info: ",j["query"]["searchinfo"])

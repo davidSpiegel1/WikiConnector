@@ -11,11 +11,28 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string>
-#include <wx/osx/core/cfstring.h>
-#include <wx/osx/core/cfref.h>
+//#include <wx/osx/core/cfstring.h>
+//#include <wx/osx/core/cfref.h>
 #include <wx/taskbar.h>
 #include <wx/image.h> 
-
+std::string getOsName()
+{
+    #ifdef _WIN32
+    return "Windows 32-bit";
+    #elif _WIN64
+    return "Windows 64-bit";
+    #elif __APPLE__ || __MACH__
+    return "Mac OSX";
+    #elif __linux__
+    return "Linux";
+    #elif __FreeBSD__
+    return "FreeBSD";
+    #elif __unix || __unix__
+    return "Unix";
+    #else
+    return "Other";
+    #endif
+} 
 
 using namespace std;
 
@@ -156,7 +173,6 @@ MyTaskBarIcon * CreateMenuBarIcon(MyFrame * f){
 
    }
 
-    
     return icon;
 }
 
@@ -168,14 +184,12 @@ bool MyApp::OnInit()
 	wxSize screenSize = wxGetDisplaySize();
 	int x = screenSize.GetWidth()-600;
 	MyFrame * frame = new MyFrame( "Embedded Connector", wxPoint(x,y), wxSize(350, 250));
-    	frame->Show( false );
-
-    	// The icon
-	//wxInitAllImageHandlers(); 
-	//wxTaskBarIcon * icon = CreateMenuBarIcon(frame);
-	//frame->Show(false);
-   	//SetTopWindow(frame); 
-    
+    	//wxFrame * frame = new wxFrame(NULL,wxID_ANY,"Blah",wxDefaultPosition,wxSize(100,100));
+	if ("Mac OSX" == getOsName()){
+		frame->Show(false);
+	}else{
+		frame->Show( true);
+	}
     return true;
 }
 
@@ -186,7 +200,8 @@ bool MyApp::OnInit()
 MyFrame::MyFrame(const wxString& title, const wxPoint& pos, const wxSize& size)
         : wxFrame(NULL, wxID_ANY, title, pos, size)
 {
-	
+
+    std::cout << getOsName();
     wxMenu *menuFile = new wxMenu;
     menuFile->Append(ID_Hello, "&Hello...\tCtrl-H",
                      "Help string shown in status bar for this menu item");
@@ -201,12 +216,10 @@ MyFrame::MyFrame(const wxString& title, const wxPoint& pos, const wxSize& size)
     CreateStatusBar();
     SetStatusText( "Welcome to wxWidgets!" );
 
-    
-    wxInitAllImageHandlers();
-    m_taskBarIcon = CreateMenuBarIcon(this);
-        
-    
-    
+    if ("Mac OSX"==getOsName()){   
+    	wxInitAllImageHandlers();
+    	m_taskBarIcon = CreateMenuBarIcon(this); 
+    }
     // Okay, now I am going to try to create a notebook
     notebook = new wxNotebook(this,wxID_ANY, wxDefaultPosition, wxDefaultSize, 0, "MyNotebook");
 
@@ -233,8 +246,6 @@ MyFrame::MyFrame(const wxString& title, const wxPoint& pos, const wxSize& size)
     panelSizer->Add(button,0,wxALIGN_CENTER | wxALL, 5);
     panelSizer->AddStretchSpacer();
     blackPanel->SetSizerAndFit(panelSizer);
-
-
 
 
     blackPanel->SetBackgroundColour(wxColour(73, 73, 73)); 
@@ -266,9 +277,6 @@ void MyFrame::OnButtonClick(wxCommandEvent& event){
 
 
 	wxMessageBox("Button clicked",textBox->GetValue(),wxOK | wxICON_INFORMATION);
-
-	// Trying to make a new video panel
-	
 	//notebook->DeletePage(1);
 	//notebook->DeletePage(0);
 	videoPanel->DestroyChildren();
@@ -333,25 +341,7 @@ void MyFrame::OnButtonClick(wxCommandEvent& event){
 	 //this->SetScrollRate(5,5);
 	 //sizer->FitInside(videoPanel);
 	 //videoPanel->ScrollWindow(20,0);
-	 // Gonna get a string
-	/*std::string myline;
-
-	if (myfile.is_open()){
-		
-
-	while (myfile){
-		//std::getline(myfile,myline);	
-		//std::string delimiter = ",";
-		std::string token;
-		//size_t pos = 0;
-		int posX = 10;
-		int posY = 10;
-		int sizeX = 100;
-		int sizeY = 100;
-		int count = 1;
-
-		wxBoxSizer* sizer = new wxBoxSizer(wxVERTICAL);
-
+	 /*
 		if (std::getline(myfile,myline)){
 
 			std::string delimiter = ",";
