@@ -1,11 +1,11 @@
 CC = g++
 CXXFLAGS = `/Users/davidspiegel/wxWidgets-3.2.4/build-cocoa-debug/wx-config --cxxflags`
 LIBS = `/Users/davidspiegel/wxWidgets-3.2.4/build-cocoa-debug/wx-config --libs`
-INCLUDE := -g -I./Users/davidspiegel/wxWidgets-3.2.4/include
+INCLUDE := -g -I./Users/davidspiegel/wxWidgets-3.2.4/include -Iinclude
 
 
 
-SOURCES = helloWorld.cpp
+SOURCES = helloWorld.cpp ../controller/Controller.cpp
 OBJECTS = $(SOURCES:.cpp=.o)
 EXECUTABLE = myapp
 

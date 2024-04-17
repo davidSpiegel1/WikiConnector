@@ -14,7 +14,11 @@
 //#include <wx/osx/core/cfstring.h>
 //#include <wx/osx/core/cfref.h>
 #include <wx/taskbar.h>
-#include <wx/image.h> 
+#include <wx/image.h>
+
+// Attempting to include the controller
+#include "../controller/Controller.h"
+
 std::string getOsName()
 {
     #ifdef _WIN32
@@ -77,6 +81,7 @@ public:
     MyFrame(const wxString& title, const wxPoint& pos, const wxSize& size);
 private:
     void OnHello(wxCommandEvent& event);
+    void OnConnect(wxCommandEvent& event);
     void OnExit(wxCommandEvent& event);
     void OnAbout(wxCommandEvent& event);
     void OnButtonClick(wxCommandEvent& event);
@@ -88,17 +93,19 @@ private:
     wxPanel * videoPanel; // Need a video panel for the result.
     //MyFrame * frame; // Need the itital frame
     MyTaskBarIcon * m_taskBarIcon;
-
+    Controller  controller;
     wxDECLARE_EVENT_TABLE();
 };
 enum
 {
-    ID_Hello = 1
+    ID_Hello = 1,
+    ID_ADD_CONNECT = 2
 };
 
 // Defining the event table
 wxBEGIN_EVENT_TABLE(MyFrame, wxFrame)
     EVT_MENU(ID_Hello,   MyFrame::OnHello)
+    EVT_MENU(ID_ADD_CONNECT,MyFrame::OnConnect)
     EVT_MENU(wxID_EXIT,  MyFrame::OnExit)
     EVT_MENU(wxID_ABOUT, MyFrame::OnAbout)
 wxEND_EVENT_TABLE()
@@ -146,14 +153,11 @@ wxMenu *MyTaskBarIcon::CreatePopupMenu()
 }
 
 
-//wxDECLARE_APP(MyApp);
 wxIMPLEMENT_APP(MyApp);
 
 
 MyTaskBarIcon * CreateMenuBarIcon(MyFrame * f){
   // Create the status item
-  //
-  //
    wxImage image(wxT("icon4.png"),wxBITMAP_TYPE_PNG);
    
    MyTaskBarIcon * icon; 
@@ -164,11 +168,6 @@ MyTaskBarIcon * CreateMenuBarIcon(MyFrame * f){
     
     icon = new MyTaskBarIcon(f);
 
-   // icon->Connect(wxEVT_TASKBAR_LEFT_UP,wxEventHandler(MyFrame::OnTaskBarIconClick),nullptr,this);
-    //wxMenu * menu = new wxMenu;
-    //menu->Append(wxID_ANY, "Open Frame");
-    //menu->Append(wxID_ANY, "Exit");
-    //icon->Bind(wxEVT_TASKBAR_RIGHT_DOWN, &MyTaskBarIcon::OnRightClick, icon);
     icon->SetIcon(sample);
 
    }
@@ -185,10 +184,10 @@ bool MyApp::OnInit()
 	int x = screenSize.GetWidth()-600;
 	MyFrame * frame = new MyFrame( "Embedded Connector", wxPoint(x,y), wxSize(350, 250));
     	//wxFrame * frame = new wxFrame(NULL,wxID_ANY,"Blah",wxDefaultPosition,wxSize(100,100));
-	if ("Mac OSX" == getOsName()){
+	if ("Mac OSX" == getOsName() || "Linux" == getOsName()){
 		frame->Show(false);
 	}else{
-		frame->Show( true);
+		frame->Show(true);
 	}
     return true;
 }
@@ -207,16 +206,30 @@ MyFrame::MyFrame(const wxString& title, const wxPoint& pos, const wxSize& size)
                      "Help string shown in status bar for this menu item");
     menuFile->AppendSeparator();
     menuFile->Append(wxID_EXIT);
+
+    // The menu help button
     wxMenu *menuHelp = new wxMenu;
     menuHelp->Append(wxID_ABOUT);
+
+    // The menu 
+    wxMenu * menuConnect = new wxMenu;
+    menuConnect->Append(ID_ADD_CONNECT, "&Add Connector... \tCtrl-H","Add a connector to query");
+
+
+    // The menu bar object that is seen when app is clicked
     wxMenuBar *menuBar = new wxMenuBar;
+
+    // Append the task bar buttons
     menuBar->Append( menuFile, "&File" );
     menuBar->Append( menuHelp, "&Help" );
+    menuBar->Append( menuConnect, "&Connectors" );
     SetMenuBar( menuBar );
     CreateStatusBar();
     SetStatusText( "Welcome to wxWidgets!" );
 
-    if ("Mac OSX"==getOsName()){   
+    if ("Mac OSX"==getOsName() || "Linux" == getOsName()){  
+	//Controller controller;
+	//cout << controller.getConnector(); 
     	wxInitAllImageHandlers();
     	m_taskBarIcon = CreateMenuBarIcon(this); 
     }
@@ -271,27 +284,29 @@ void MyFrame::OnHello(wxCommandEvent& event)
     wxLogMessage("Video Connector");
 }
 
+void MyFrame::OnConnect(wxCommandEvent& event){
+
+	wxMessageBox("Connect clicked","About", wxOK | wxICON_INFORMATION);
+	//Show(false);
+	wxPanel * p = new wxPanel(this);
+}
+
 // What happends when button is clicked
 void MyFrame::OnButtonClick(wxCommandEvent& event){
 
 
 
 	wxMessageBox("Button clicked",textBox->GetValue(),wxOK | wxICON_INFORMATION);
-	//notebook->DeletePage(1);
-	//notebook->DeletePage(0);
 	videoPanel->DestroyChildren();
 	
 
 	notebook->ChangeSelection(0);
 	
-	// Attempting to place the query into a new file
-	//std::ofstream outputFile("test.txt");
-	
-	int result = system("cd ..; cd model; python3 WikiSource.py "+textBox->GetValue());
-	
-	// Going to try and move the file into the correct drectory
-	int result2 = system("cd ..; cd model; cp test.csv ../view");
-	
+	// Attempting to pass the data to the controller
+	std::string query = std::string(textBox->GetValue().ToStdString());
+	controller.Query(query);
+
+
 	std::ifstream myfile("test.csv");
 	//myfile.open("test.csv");
 	std::string str;
