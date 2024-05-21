@@ -89,7 +89,6 @@ private:
     void OnConnectClick(wxCommandEvent& event);
     //void OnConnectorClick(wxCommandEvent& event);
     void OnConnectorPick(wxCommandEvent& event);
-    int GetMenuLength(wxMenu * menu);
     //void OnClick2(wxTaskBarIconEvent& event);
     //wxDECLARE_EVENT_TABLE();
 
@@ -348,6 +347,25 @@ void MyFrame::OnConnect(wxCommandEvent& event){
 		wxCheckBox * cbox = new wxCheckBox(sw,wxID_ANY,connectionManagers.at(i),wxPoint(x1,x2),wxDefaultSize);
 		cbox->SetName(connectionManagers.at(i));
 		//cbox->Bind(wxEVT_BUTTON,&MyFrame::OnConnectorPick,this);
+		cbox->Bind(wxEVT_CHECKBOX,[this,cbox](wxCommandEvent& event){
+			
+			wxMessageBox("HI",cbox->GetName(),wxOK);
+			if (cbox->GetName()=="Wiki"){
+
+				connectors.push_back("Wiki");
+				myIds.push_back(5);
+
+			}else if (cbox->GetName()=="WorldBank"){
+
+				connectors.push_back("WorldBank");
+				myIds.push_back(6);
+
+			}else{
+
+				
+			}
+		});
+
 		if (i <= connectors.size()-1){
 			int c = count(connectors.begin(),connectors.end(),connectors.at(i));
 		if (c >= 1){
@@ -371,6 +389,10 @@ void MyFrame::OnConnect(wxCommandEvent& event){
 
 	done->Bind(wxEVT_BUTTON,[=](wxCommandEvent &e){
 	
+		
+			wxMessageBox("WHAT",connectors.back(), wxOK);
+
+
 		if (textBox->GetValue() != "Default Name"){
 			wxMenuItem * it = new wxMenuItem(menuConnect,6,textBox->GetValue());
 			
@@ -397,15 +419,6 @@ void MyFrame::OnConnect(wxCommandEvent& event){
 }
 
 
-int MyFrame::GetMenuLength(wxMenu* menu) {
-    int count = 0;
-    wxMenuItemList items = menu->GetMenuItems();
-    for (auto it = items.begin(); it != items.end(); ++it) {
-        ++count;
-    }
-    return count;
-}
-
 void MyFrame::OnConnectorPick(wxCommandEvent& event){
 
 	auto  * btn = (wxCheckBox *) event.GetEventObject();
@@ -417,9 +430,7 @@ void MyFrame::OnConnectorPick(wxCommandEvent& event){
 		
 		connectors.push_back("Wiki");
 		myIds.push_back(5);
-		//wxDialog * d = new wxDialog(this,wxID_ANY,"Dialog");
-		//wxMenuItem * it = new wxMenuItem(menuConnect,wxID_ANY,"Wiki");
-		//menuConnect->Append(it);
+		
 		btn->Enable(false);
 	   }
 
@@ -438,25 +449,23 @@ void MyFrame::OnConnectorPick(wxCommandEvent& event){
 	//wxString str = wxString(std::to_string(event.GetName()));
 
 }
+
 void MyFrame::OnConnectClick(wxCommandEvent& event){
-
 	wxString str = wxString(std::to_string(event.GetId()));
-	// Wiki is 5 for now.
+
 	if (str=="5"){
-		wxMessageBox("",str,wxOK | wxICON_INFORMATION);
-		controller.changeConnector("Wiki");	
+		controller.changeConnector("Wiki");
 
-	}else if (str == "6"){
+	}else if (str=="6"){
 
-		wxMessageBox("",str,wxOK | wxICON_INFORMATION);
 		controller.changeConnector("WorldBank");
 	}
-
 	else{
-	wxMessageBox("NOT Right Button",str,wxOK | wxICON_INFORMATION);
-	}
-}
+		wxMessageBox("Not right button",str,wxOK);
 
+	}
+
+}
 // What happends when button is clicked
 void MyFrame::OnButtonClick(wxCommandEvent& event){
 
