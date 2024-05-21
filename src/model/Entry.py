@@ -29,7 +29,10 @@ class WikiWrapper (Entry):
         self.data = data
         super().__init__(self.data)
         
-
+class WorldBankWrapper(Entry):
+    def __init__(self,data):
+        self.data = data
+        super().__init__(self.data)
 #data = [{"title": "Mike","Description":"Mike is a man"}]
 #e = Entry(data)
 #e.toCSV()
