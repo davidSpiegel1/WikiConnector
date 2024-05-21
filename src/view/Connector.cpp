@@ -15,6 +15,7 @@
 //#include <wx/osx/core/cfref.h>
 #include <wx/taskbar.h>
 #include <wx/image.h>
+#include <vector>
 
 // Attempting to include the controller
 #include "../controller/Controller.h"
@@ -85,6 +86,10 @@ private:
     void OnExit(wxCommandEvent& event);
     void OnAbout(wxCommandEvent& event);
     void OnButtonClick(wxCommandEvent& event);
+    void OnConnectClick(wxCommandEvent& event);
+    //void OnConnectorClick(wxCommandEvent& event);
+    void OnConnectorPick(wxCommandEvent& event);
+    int GetMenuLength(wxMenu * menu);
     //void OnClick2(wxTaskBarIconEvent& event);
     //wxDECLARE_EVENT_TABLE();
 
@@ -92,20 +97,34 @@ private:
     wxTextCtrl * textBox;    // Going to try and do this for text box as well
     wxPanel * videoPanel; // Need a video panel for the result.
     //MyFrame * frame; // Need the itital frame
+    wxMenu * menuConnect;
     MyTaskBarIcon * m_taskBarIcon;
     Controller  controller;
+    //string connectionManagers[2] = {"Wiki","WorldBank"};
+
+    vector<string> connectors;
+    //connectors.push_back(myString);
+
+    vector<string>  connectionManagers;
+    vector<int> connectionIds;
+    vector<int> myIds;
+    //connectionManagers.push_back(myString);
+    //connectionManagers.push_back("WorldBank");
+
     wxDECLARE_EVENT_TABLE();
 };
 enum
 {
     ID_Hello = 1,
-    ID_ADD_CONNECT = 2
+    ID_ADD_CONNECT = 2,
+    ID_CONNECT = 3	    
 };
 
 // Defining the event table
 wxBEGIN_EVENT_TABLE(MyFrame, wxFrame)
     EVT_MENU(ID_Hello,   MyFrame::OnHello)
     EVT_MENU(ID_ADD_CONNECT,MyFrame::OnConnect)
+    EVT_MENU(wxID_ANY,MyFrame::OnConnectorPick)
     EVT_MENU(wxID_EXIT,  MyFrame::OnExit)
     EVT_MENU(wxID_ABOUT, MyFrame::OnAbout)
 wxEND_EVENT_TABLE()
@@ -200,6 +219,17 @@ MyFrame::MyFrame(const wxString& title, const wxPoint& pos, const wxSize& size)
         : wxFrame(NULL, wxID_ANY, title, pos, size)
 {
 
+	// Initalizing the connectors and connection managers
+    connectors.push_back("Wiki");
+
+    connectionManagers.push_back("Wiki");
+    connectionManagers.push_back("WorldBank");
+
+    connectionIds.push_back(5);// Id for Wiki is 5
+    connectionIds.push_back(6); // Id for WorldBank is 6
+
+    myIds.push_back(5);
+
     std::cout << getOsName();
     wxMenu *menuFile = new wxMenu;
     menuFile->Append(ID_Hello, "&Hello...\tCtrl-H",
@@ -212,7 +242,17 @@ MyFrame::MyFrame(const wxString& title, const wxPoint& pos, const wxSize& size)
     menuHelp->Append(wxID_ABOUT);
 
     // The menu 
-    wxMenu * menuConnect = new wxMenu;
+     menuConnect = new wxMenu;
+    for (int i=0;i<=connectors.size()-1;i++){
+	    //int number = std::stoi(connectors.at(i));
+	    
+	    wxMenuItem * buttonItem = new wxMenuItem(menuConnect,i+5,connectors.at(i),"", wxITEM_NORMAL);
+	    menuConnect->Append(buttonItem);
+	    Bind(wxEVT_COMMAND_MENU_SELECTED,&MyFrame::OnConnectClick,this ,buttonItem->GetId());
+	    //menuConnect->Append(wxID_ANY,connectors.at(i),"Connetor Name");
+
+
+    }
     menuConnect->Append(ID_ADD_CONNECT, "&Add Connector... \tCtrl-H","Add a connector to query");
 
 
@@ -286,9 +326,135 @@ void MyFrame::OnHello(wxCommandEvent& event)
 
 void MyFrame::OnConnect(wxCommandEvent& event){
 
-	wxMessageBox("Connect clicked","About", wxOK | wxICON_INFORMATION);
+	wxMessageBox("Connect MarketPlace clicked","About", wxOK | wxICON_INFORMATION);
 	//Show(false);
-	wxPanel * p = new wxPanel(this);
+	int y = 20;
+	wxSize screenSize = wxGetDisplaySize();
+	int x = screenSize.GetWidth()-600;
+	wxFrame * f = new wxFrame(NULL,wxID_ANY,"Connector MarketPlace",wxPoint(x,y),wxSize(400,250));
+	
+	// A panel
+	//wxPanel * panel = new wxPanel();
+	// The list of possible connecto
+	wxSizer * sizer = new wxBoxSizer(wxVERTICAL);
+	wxScrolledWindow * sw = new wxScrolledWindow(f, wxID_ANY,wxPoint(0,0),wxSize(350,200));
+	int x1 = 10;
+	int x2 = 10;
+	for (int i = 0; i<= connectionManagers.size()-1;i++){
+		//wxButton * b1 = new wxButton(sw,wxID_ANY,connectionManagers.at(i),wxPoint(x1,x2),wxDefaultSize);
+		//b1->SetName(connectionManagers.at(i));
+		//b1->Bind(wxEVT_BUTTON, &MyFrame::OnConnectorPick,this);
+		
+		wxCheckBox * cbox = new wxCheckBox(sw,wxID_ANY,connectionManagers.at(i),wxPoint(x1,x2),wxDefaultSize);
+		cbox->SetName(connectionManagers.at(i));
+		//cbox->Bind(wxEVT_BUTTON,&MyFrame::OnConnectorPick,this);
+		if (i <= connectors.size()-1){
+			int c = count(connectors.begin(),connectors.end(),connectors.at(i));
+		if (c >= 1){
+			//	b1->Enable(false);
+			cbox->SetValue(false);
+		}
+		}
+		x2 = x2+100;
+	}
+	wxBoxSizer * wdSizer = new wxBoxSizer(wxVERTICAL);
+	wdSizer->Add(sizer,0,wxALIGN_CENTER,2);
+	sw->SetSizer(wdSizer);
+
+	
+	wxTextCtrl * textBox = new wxTextCtrl(f, wxID_ANY, "Default Name", wxDefaultPosition, wxSize(130,25), wxTE_MULTILINE);
+
+	wxButton * done = new wxButton(f,wxID_ANY,"DONE?",wxPoint(60,60),wxSize(100,100));
+	sw->FitInside();
+	sw->SetScrollRate(3,3);
+
+
+	done->Bind(wxEVT_BUTTON,[=](wxCommandEvent &e){
+	
+		if (textBox->GetValue() != "Default Name"){
+			wxMenuItem * it = new wxMenuItem(menuConnect,6,textBox->GetValue());
+			
+			Bind(wxEVT_COMMAND_MENU_SELECTED,&MyFrame::OnConnectClick,this ,it->GetId());
+
+			wxMenuItem * item = menuConnect->FindItem(ID_ADD_CONNECT);
+			
+
+			menuConnect->Delete(item);
+
+			menuConnect->Append(it);
+			menuConnect->Append(ID_ADD_CONNECT, "&Add Connector... \tCtrl-H","Add a connector to query");
+
+
+		}
+	
+		f->Close();
+
+
+	});
+
+	f->Show(true);
+	
+}
+
+
+int MyFrame::GetMenuLength(wxMenu* menu) {
+    int count = 0;
+    wxMenuItemList items = menu->GetMenuItems();
+    for (auto it = items.begin(); it != items.end(); ++it) {
+        ++count;
+    }
+    return count;
+}
+
+void MyFrame::OnConnectorPick(wxCommandEvent& event){
+
+	auto  * btn = (wxCheckBox *) event.GetEventObject();
+	wxMessageBox("WHAT",btn->GetName(), wxOK);
+	if (btn->GetName() == "Wiki"){
+	
+		int c = count(myIds.begin(),myIds.end(),5);
+	   if (c <= 0){
+		
+		connectors.push_back("Wiki");
+		myIds.push_back(5);
+		//wxDialog * d = new wxDialog(this,wxID_ANY,"Dialog");
+		//wxMenuItem * it = new wxMenuItem(menuConnect,wxID_ANY,"Wiki");
+		//menuConnect->Append(it);
+		btn->Enable(false);
+	   }
+
+	}else if (btn->GetName() == "WorldBank"){
+		int c = count(myIds.begin(),myIds.end(),6);	
+	   if (c <= 0){
+		connectors.push_back("WorldBank");
+		myIds.push_back(6);
+		//wxMenuItem * it2 = new wxMenuItem(menuConnect,wxID_ANY,"WorldBank");
+		//menuConnect->Append(it2);
+		//btn->Enable(false);
+	   }	
+		
+
+	}
+	//wxString str = wxString(std::to_string(event.GetName()));
+
+}
+void MyFrame::OnConnectClick(wxCommandEvent& event){
+
+	wxString str = wxString(std::to_string(event.GetId()));
+	// Wiki is 5 for now.
+	if (str=="5"){
+		wxMessageBox("",str,wxOK | wxICON_INFORMATION);
+		controller.changeConnector("Wiki");	
+
+	}else if (str == "6"){
+
+		wxMessageBox("",str,wxOK | wxICON_INFORMATION);
+		controller.changeConnector("WorldBank");
+	}
+
+	else{
+	wxMessageBox("NOT Right Button",str,wxOK | wxICON_INFORMATION);
+	}
 }
 
 // What happends when button is clicked
@@ -351,24 +517,6 @@ void MyFrame::OnButtonClick(wxCommandEvent& event){
 	wd->SetSizer(wdSizer);
 	wd->FitInside();
 	wd->SetScrollRate(3,3);
-	 //this->SetSizer(sizer);
-	 //this->FitInside();
-	 //this->SetScrollRate(5,5);
-	 //sizer->FitInside(videoPanel);
-	 //videoPanel->ScrollWindow(20,0);
-	 /*
-		if (std::getline(myfile,myline)){
-
-			std::string delimiter = ",";
-			size_t pos = 0;
-		// Where we are trying to build the video panel
-		while ((pos =myline.find(delimiter)) != std::string::npos){
-					
-			token = myline.substr(0,pos-1);
-			myline.erase(0,pos+delimiter.length());
-			std::string title = "TITLE:";
-			
-		*/	
 
 
 
