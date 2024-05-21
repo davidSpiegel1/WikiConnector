@@ -195,6 +195,7 @@ MyTaskBarIcon * CreateMenuBarIcon(MyFrame * f){
 
 bool MyApp::OnInit()
 {
+        std::cout << "helo\n";
     
 	// WILL DO THIS on clicking the icon!!
 	int y = 20;
@@ -203,9 +204,9 @@ bool MyApp::OnInit()
 	MyFrame * frame = new MyFrame( "Embedded Connector", wxPoint(x,y), wxSize(350, 250));
     	//wxFrame * frame = new wxFrame(NULL,wxID_ANY,"Blah",wxDefaultPosition,wxSize(100,100));
 	if ("Mac OSX" == getOsName() || "Linux" == getOsName()){
-		frame->Show(false);
-	}else{
 		frame->Show(true);
+	}else{
+		frame->Show(false);
 	}
     return true;
 }

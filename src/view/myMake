@@ -1,7 +1,10 @@
 CC = g++ -std=c++11
-CXXFLAGS = `/Users/davidspiegel/wxWidgets-3.2.4/build-cocoa-debug/wx-config --cxxflags`
-LIBS = `/Users/davidspiegel/wxWidgets-3.2.4/build-cocoa-debug/wx-config --libs`
-INCLUDE := -g -I./Users/davidspiegel/wxWidgets-3.2.4/include -Iinclude
+//CXXFLAGS = `/Users/davidspiegel/wxWidgets-3.2.4/build-cocoa-debug/wx-config --cxxflags`
+//LIBS = `/Users/davidspiegel/wxWidgets-3.2.4/build-cocoa-debug/wx-config --libs`
+//INCLUDE := -g -I./Users/davidspiegel/wxWidgets-3.2.4/include -Iinclude
+CXXFLAGS = `wx-config-qt --cxxflags`
+LIBS = `wx-config-qt --libs`
+INCLUDE := -g -I./usr/lib/wx/include/ -Iinclude
 
 
 
