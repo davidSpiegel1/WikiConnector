@@ -87,7 +87,7 @@ private:
     void OnAbout(wxCommandEvent& event);
     void OnButtonClick(wxCommandEvent& event);
     void OnConnectClick(wxCommandEvent& event);
-    //void OnConnectorClick(wxCommandEvent& event);
+    void OnConnectClickStr(string str);
     void OnConnectorPick(wxCommandEvent& event);
     //void OnClick2(wxTaskBarIconEvent& event);
     //wxDECLARE_EVENT_TABLE();
@@ -223,9 +223,11 @@ MyFrame::MyFrame(const wxString& title, const wxPoint& pos, const wxSize& size)
 
     connectionManagers.push_back("Wiki");
     connectionManagers.push_back("WorldBank");
+    connectionManagers.push_back("AppleMusic");
 
     connectionIds.push_back(5);// Id for Wiki is 5
     connectionIds.push_back(6); // Id for WorldBank is 6
+    connectionIds.push_back(7); // Id for AppleMusic is 7
 
     myIds.push_back(5);
 
@@ -246,14 +248,25 @@ MyFrame::MyFrame(const wxString& title, const wxPoint& pos, const wxSize& size)
 	    //int number = std::stoi(connectors.at(i));
 	    
 	    wxMenuItem * buttonItem = new wxMenuItem(menuConnect,i+5,connectors.at(i),"", wxITEM_NORMAL);
-	    menuConnect->Append(buttonItem);
-	    Bind(wxEVT_COMMAND_MENU_SELECTED,&MyFrame::OnConnectClick,this ,buttonItem->GetId());
-	    //menuConnect->Append(wxID_ANY,connectors.at(i),"Connetor Name");
+	    buttonItem->SetHelp(std::to_string(i+5));
+	    //Bind(wxEVT_COMMAND_MENU_SELECTED,&MyFrame::OnConnectClick,this,i+5,buttonItem->GetId());
+	    Bind(wxEVT_COMMAND_MENU_SELECTED,[=](wxCommandEvent &e){
 
+			wxMessageBox("Button clicked",buttonItem->GetHelp(),wxOK | wxICON_INFORMATION);
+
+			OnConnectClickStr(buttonItem->GetHelp().mb_str().data());
+
+	    },buttonItem->GetId());
+	    menuConnect->Append(buttonItem);
+	    //Bind(wxEVT_COMMAND_MENU_SELECTED,&MyFrame::OnConnectClick,this,i+5,buttonItem->GetId());//,i+5/*buttonItem->GetId()*/);
+	    
+	    
+	    //menuConnect->Append(wxID_ANY,connectors.at(i),"Connetor Name");
+	
 
     }
     menuConnect->Append(ID_ADD_CONNECT, "&Add Connector... \tCtrl-H","Add a connector to query");
-
+    //Bind(wxEVT_COMMAND_MENU_SELECTED,&MyFrame::OnConnect,ID_ADD_CONNECT);
 
     // The menu bar object that is seen when app is clicked
     wxMenuBar *menuBar = new wxMenuBar;
@@ -337,8 +350,8 @@ void MyFrame::OnConnect(wxCommandEvent& event){
 	// The list of possible connecto
 	wxSizer * sizer = new wxBoxSizer(wxVERTICAL);
 	wxScrolledWindow * sw = new wxScrolledWindow(f, wxID_ANY,wxPoint(0,0),wxSize(350,200));
-	int x1 = 10;
-	int x2 = 10;
+	int x1 = 50;
+	int x2 = 50;
 	for (int i = 0; i<= connectionManagers.size()-1;i++){
 		//wxButton * b1 = new wxButton(sw,wxID_ANY,connectionManagers.at(i),wxPoint(x1,x2),wxDefaultSize);
 		//b1->SetName(connectionManagers.at(i));
@@ -360,6 +373,11 @@ void MyFrame::OnConnect(wxCommandEvent& event){
 				connectors.push_back("WorldBank");
 				myIds.push_back(6);
 
+			}else if (cbox->GetName()=="AppleMusic"){
+
+				connectors.push_back("AppleMusic");
+				myIds.push_back(7);
+
 			}else{
 
 				
@@ -373,16 +391,16 @@ void MyFrame::OnConnect(wxCommandEvent& event){
 			cbox->SetValue(false);
 		}
 		}
-		x2 = x2+100;
+		x2 = x2+50;
 	}
 	wxBoxSizer * wdSizer = new wxBoxSizer(wxVERTICAL);
 	wdSizer->Add(sizer,0,wxALIGN_CENTER,2);
 	sw->SetSizer(wdSizer);
 
 	
-	wxTextCtrl * textBox = new wxTextCtrl(f, wxID_ANY, "Default Name", wxDefaultPosition, wxSize(130,25), wxTE_MULTILINE);
+	wxTextCtrl * textBox = new wxTextCtrl(f, wxID_ANY, "Default Name", wxPoint(100,0), wxSize(130,25), wxTE_MULTILINE);
 
-	wxButton * done = new wxButton(f,wxID_ANY,"DONE?",wxPoint(60,60),wxSize(100,100));
+	wxButton * done = new wxButton(f,wxID_ANY,"DONE?",wxPoint(x2+10,x1+10),wxSize(100,100));
 	sw->FitInside();
 	sw->SetScrollRate(3,3);
 
@@ -394,10 +412,21 @@ void MyFrame::OnConnect(wxCommandEvent& event){
 
 
 		if (textBox->GetValue() != "Default Name"){
-			wxMenuItem * it = new wxMenuItem(menuConnect,6,textBox->GetValue());
-			
-			Bind(wxEVT_COMMAND_MENU_SELECTED,&MyFrame::OnConnectClick,this ,it->GetId());
 
+			
+			wxMenuItem * it = new wxMenuItem(menuConnect,6,textBox->GetValue());
+
+			
+			it->SetHelp(std::to_string(myIds.back()));
+			//Bind(wxEVT_COMMAND_MENU_SELECTED,&MyFrame::OnConnectClick,this /*,it->GetHelp()*/);
+
+			 Bind(wxEVT_COMMAND_MENU_SELECTED,[=](wxCommandEvent &e){
+
+			wxMessageBox("Button clicked",it->GetHelp(),wxOK | wxICON_INFORMATION);
+
+			OnConnectClickStr(it->GetHelp().mb_str().data());
+
+	    },it->GetId());
 			wxMenuItem * item = menuConnect->FindItem(ID_ADD_CONNECT);
 			
 
@@ -445,27 +474,62 @@ void MyFrame::OnConnectorPick(wxCommandEvent& event){
 	   }	
 		
 
+	}else if (btn->GetName() == "AppleMusic"){
+			int c = count(myIds.begin(),myIds.end(),6);
+		if (c <= 0){
+			connectors.push_back("AppleMusic");
+			myIds.push_back(7);
+		}
 	}
 	//wxString str = wxString(std::to_string(event.GetName()));
 
 }
 
 void MyFrame::OnConnectClick(wxCommandEvent& event){
-	wxString str = wxString(std::to_string(event.GetId()));
+	//wxString str = wxString(std::to_string(event.GetHelp()));
 
+	auto * btn = (wxMenuItem *) event.GetEventObject();
+
+	wxString str = wxString(btn->GetHelp());
+	wxString str2 = wxString(std::to_string(btn->GetId()));	
 	if (str=="5"){
 		controller.changeConnector("Wiki");
 
 	}else if (str=="6"){
 
 		controller.changeConnector("WorldBank");
-	}
-	else{
-		wxMessageBox("Not right button",str,wxOK);
+	}else if (str=="7"){
+	
+		controller.changeConnector("AppleMusic");
+	}else
+	{
+		wxMessageBox("Not right but"+str,str2,wxOK);
 
 	}
+
 
 }
+
+
+void MyFrame::OnConnectClickStr(string str){
+
+ 	wxString str2 = wxString(str);
+	if (str=="5"){
+		controller.changeConnector("Wiki");
+	} else if (str=="6"){
+
+		controller.changeConnector("WorldBank");
+	} else if (str=="7"){
+
+		controller.changeConnector("AppleMusic");
+	}
+
+	else{
+		wxMessageBox("Not right button",str2,wxOK);
+	}
+
+}	
+
 // What happends when button is clicked
 void MyFrame::OnButtonClick(wxCommandEvent& event){
 

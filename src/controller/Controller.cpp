@@ -52,7 +52,18 @@ void Controller::Query (string query){
 
 	int result = system(command);
 
+     }else if (this->connector == "AppleMusic"){
+
+	char command[query.length()+sizeof("cd ..; cd model; python3 AppleMusic.py ")];
+
+	strcpy(command,"cd ..; cd model; python3 AppleMusic.py ");
+
+	strcat(command,strLiteral);
+
+	int result = system(command);
+
      }
+
     
     	// Use the concatenated command with the system function
    	//int result = system(command);
