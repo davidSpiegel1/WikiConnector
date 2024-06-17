@@ -89,6 +89,7 @@ private:
     void OnConnectClick(wxCommandEvent& event);
     void OnConnectClickStr(string str);
     void OnConnectorPick(wxCommandEvent& event);
+    void ExcelViewer(wxCommandEvent& event);
     //void OnClick2(wxTaskBarIconEvent& event);
     //wxDECLARE_EVENT_TABLE();
 
@@ -572,7 +573,11 @@ void MyFrame::OnButtonClick(wxCommandEvent& event){
 			std::string newStr = str.substr(pos+6,pos2-7);
 			wxButton * bn = new wxButton(wd,wxID_ANY,newStr,wxPoint(posX,posY),wxSize(sizeX,sizeY));
 			
-			sizer->Add(bn,0,wxALIGN_CENTER,2);
+			bn->SetName(newStr);
+			
+			bn->Bind(wxEVT_BUTTON,&MyFrame::ExcelViewer,this);
+			
+			sizer->Add(bn,0,wxALIGN_CENTER,2);	
 
 			//osX = posX+100;
 			//if (count%2 == 0){
@@ -591,6 +596,16 @@ void MyFrame::OnButtonClick(wxCommandEvent& event){
 	wd->FitInside();
 	wd->SetScrollRate(3,3);
 
+}
 
+void MyFrame::ExcelViewer(wxCommandEvent& event){
+
+	int y = 20;
+	wxSize screenSize = wxGetDisplaySize();
+	int x = screenSize.GetWidth()-600;
+	wxFrame * f = new wxFrame(NULL,wxID_ANY,"Excel Viewer",wxPoint(x,y),wxSize(400,250));
+
+	f->Show(true);
 
 }
+		
