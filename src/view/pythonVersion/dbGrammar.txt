@@ -1,0 +1,11 @@
+# Extemded backus naur form
+# EBNF
+
+select := 'select' expression [ whereExpr ]
+whereExpr := 'where' condition
+condtion := ID comp expression
+comp := '<' | '>' | '='
+expression := (expression) | condition | INT
+
+
+
