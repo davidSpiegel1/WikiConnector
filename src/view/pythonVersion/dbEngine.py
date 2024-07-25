@@ -194,13 +194,22 @@ class Query:
 	def __init__(self,commands):
 		self.com = commands
 		self.columnList = self.getColumn(commands['column'].strip())
+		self.fList = []
 		print("Column list:",self.columnList)
 		if len(self.com) > 1:
 			
 			finalList = self.filterColumn(commands,self.columnList)
 			print("the final list:",finalList)
+			self.fList = finalList
 		else:
 			print("the final list w/o condition:",self.columnList)
+			self.fList = self.columnList
+
+
+	def getFlist(self):
+		return self.fList
+
+
 	def getColumn(self, columnName):
 		columnList = []
 		with open('test.csv',newline='') as c:
@@ -254,6 +263,8 @@ class dbEngine:
 		self.tokens = []
 		self.scanner = None
 		self.parser = None
+		self.q = None
+
 	def scan(self,string):
 		self.scanner = Scanner(string)
 	def parse(self):
@@ -263,8 +274,10 @@ class dbEngine:
 		#print("the interpreter: ",interpreter)
 		result = interpreter.interpret()
 		print("The interpreter: ",result)
-		q = Query(result)
 		
+		self.q = Query(result)
+	def getFlist(self):
+		return self.q.getFlist() if self.q is not None else None
 		#while True:
 		#self.token = scanner.get_next_token()
 		#self.tokens.append(self.token)
@@ -274,11 +287,11 @@ class dbEngine:
 		#print(self.tokens)
 
 
-d = dbEngine("HI")
+#d = dbEngine("HI")
 
-d.scan("select PAGEID where TITLE=MIKE MYERS")
+#d.scan("select PAGEID where TITLE=MIKE MYERS")
 
 #d.scan(sys.argv)
-d.parse()
+#d.parse()
 
 
