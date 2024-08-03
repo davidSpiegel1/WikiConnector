@@ -21,13 +21,15 @@ def search (query):
         nameId = ""
         description = ""
         finalBit = []
+        count = 158
         for cur in v:
             #for i in cur:
             #print(cur['identification'])   
             title = "TITLE: "+str(cur['identification']['title'])
             pageid = "PAGEID: "+str(cur['identification']['id'])
             snippet = "SNIPPET: "+str(cur['identification']['description'])
-            finalBit.append({"title":title,"pageid":pageid,"snippet":snippet})
+            finalBit.append({"title":title,"pageid":count,"snippet":snippet})
+            count += 96
 
         print(finalBit)
         wr = WorldBankWrapper(finalBit)

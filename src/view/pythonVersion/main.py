@@ -5,6 +5,7 @@ from tkinter import ttk,font
 import os
 import subprocess
 #import pandas as pd
+from Controller.controller import *
 import csv
 
 
@@ -16,6 +17,8 @@ class App(tk.Tk):
         #self.geometry("200x200")
         self.title("Video Connector")
         self.center(self)
+        
+        self.Controller = Controller()
 
         # A global font might be useful
         self.font = font.Font(family="Courier",size=20,weight=font.BOLD)
@@ -23,13 +26,15 @@ class App(tk.Tk):
 
         # Attempting to make a notebook
         self.nb = ttk.Notebook(self)
-        
-        
+        self.tempCon = "" 
+        self.Connectors = {} # A Dictionary that will hold the name and the kind of connector
+        self.possibleConnectors = ["Wiki","WorldBank","Apple Music"]
+
         self.videoPane = ttk.Frame(self.nb)
         self.queryPane = ttk.Frame(self.nb)
         
         self.dbEng = dbEngine("HI")
-        
+        self.showEditor = False
         self.videoPane.pack(fill=tk.BOTH,expand=True)
         self.queryPane.pack(fill=tk.BOTH,expand=True)
         self.nb.add(self.videoPane,text="Video")
@@ -44,30 +49,108 @@ class App(tk.Tk):
 
         self.bind('<Return>',lambda e: self.show())
 
-
-
-        #this.query = tk.simpledialog.askstring("Input"
         B.pack(side='bottom')
-
+        
+        self.curConLabel = tk.Label(self.queryPane,text=self.Controller.getConnector())
+       
+        self.curConLabel.pack(side='top')
         # Text box for it
         self.queryBox = ttk.Entry(self.queryPane,width=10,font=self.font)
 
-                
+          
+        
         self.queryBox.pack(side='top')
 
-        #self.queryBox.pady(10)
-        #myX: int = B.winfo_x()
-        #myY: int = B.winfo_y()
-        #myX = myX*(0.50)
-        #myY = myY*(0.55)
-        #B.place(x=myX,y=myY)
-        #self.center(B)
+        self.constructMenu()
+
+
+
+    def constructMenu(self):
+        self.menuBar = tk.Menu(self)
+        self.connectMenu = tk.Menu(self.menuBar,tearoff=0)
+        
+        for ids in self.Connectors:
+            name = self.Connectors[ids]
+            self.connectMenu.add_command(label=name,command=lambda e = ids: self.EnableConnector(e))
+
+        self.connectMenu.add_command(label="Add Connector",command=self.ShowConnectors)
+        
+
+        
+        self.menuBar.add_cascade(label="Connectors",menu=self.connectMenu)
+        self.config(menu=self.menuBar)
+    
+
     def showSnippet(self,curId):
         print("HI",curId)
         for widget in self.videoPane.winfo_children():
             widget.destroy()
 
+    def ShowConnectors(self):
+        newWindow = tk.Toplevel(self)
+        newWindow.title("Get New Connector")
+        self.center(newWindow)
         
+        typeClicked = ""
+        #var = tk.StringVar()# Variable
+        for con in self.possibleConnectors:
+            #var = tk.StringVar(con)
+            b = tk.Checkbutton(newWindow,text=con,command=lambda e=con: self.setTempCon(e))
+            
+            b.pack(side='top')
+        #print("typeClicked: ",typeClicked)
+        
+        #entry = tk.Entry(newWindow,width=45,font=self.font)
+        #entry.pack(side='bottom')
+        #ilb1 = tk.Label(newWindow,text="Name:",font=self.font)
+        #lb1.pack(side="left")
+        #but = tk.Button(newWindow,text="Add",command=lambda e= self.addConnector)
+        #but.pack(side='bottom')
+        
+        lb1 = tk.Label(newWindow,text="Name:",font=self.font2)
+        lb1.pack(side="left")
+        entry = tk.Entry(newWindow,width=20,highlightthickness=3,font=self.font2)
+        entry.config(highlightbackground = "blue", highlightcolor= "blue")
+        entry.pack(side='left')
+        
+        
+        but = tk.Button(newWindow,text="Add",command=lambda e= entry,e2=lb1,e3=newWindow: self.addConnector(e,e2,e3))
+        but.pack(side='bottom',anchor='w')
+
+
+    def addConnector(self,ent,label,root):
+        print(self.tempCon)
+        name = ent.get()
+        if len(name) <= 0:
+            label['text']="name required"
+            ent.config(highlightbackground = "red", highlightcolor= "red")
+        elif len(self.tempCon) <= 0:
+            label['text']="connector required"
+            #ent.config({"background":"red"})
+            ent.config(highlightbackground = "red", highlightcolor= "red")    
+        else:
+            label['text'] = "Name:"
+            #self.tempCon = ''
+            ent.config(highlightbackground="blue",highlightcolor="blue")
+            self.Connectors[self.tempCon] = name
+            self.connectMenu.add_command(label=name,command=lambda e=self.tempCon: self.EnableConnector(e))
+            newWin = tk.Toplevel(root)
+            self.tempCon=''
+            #b1 = tk.Button(newWin,text="OK",command=lambda: root.destroy())
+            
+            #b1.pack(side='bottom')
+            root.destroy()
+    
+    def setTempCon(self,temp):
+        self.tempCon = temp
+    
+
+    def EnableConnector(self,con):
+        print("HI")
+        #if self.Controller is not None:
+        self.Controller.setConnector(con)
+        self.curConLabel.config(text=con)
+
     # To help center the window we are using
     def center (self,win):
         win.update_idletasks()
@@ -97,9 +180,12 @@ class App(tk.Tk):
         
 
         text = self.queryBox.get()
+
+        
+        self.Controller.query(text)
         #print(":",text)
         #path = os.path.abspath(os.getcwd())+"/pythonVersion"
-        os.chdir('../') 
+        """os.chdir('../') 
         os.chdir('../')
         path = os.listdir()
         p2 = os.path.abspath(os.getcwd())
@@ -115,7 +201,8 @@ class App(tk.Tk):
         os.system("python3 WikiSource.py "+text+"; mv test.csv "+view+"/pythonVersion")
         os.chdir("../")
         os.chdir("view/pythonVersion")
-        #print("The dir",os.listdir())
+        #print("The dir",os.listdir())"""
+
         self.displayCSV()
 
     def displayViewer(self,info):
@@ -123,25 +210,40 @@ class App(tk.Tk):
         for widget in self.videoPane.winfo_children():
             widget.destroy()
 
-        backbut = tk.Button(self.videoPane,text="<",command=self.displayCSV)
-        backbut.pack(side='top',anchor='nw')
-    
+        
+        header = tk.Frame(self.videoPane)
+        header.pack(side='top')
+        backbut = tk.Button(header,text="<",command=self.displayCSV)
+        backbut.pack(side='left',anchor='nw')
+        
+        
         
         #run = tk.Button(self.videoPane,text="run",command=lambda e=qb.get(): self.displayViewer(e))
 
-        qb = ttk.Entry(self.videoPane,width=45,font=self.font2)
+        qb = ttk.Entry(header,width=45,font=self.font2)
         
         qb.delete(0,tk.END)
         if  ':' in info:
+            print("What info is: ",info.split(':')[1])
             qb.insert(0,'select SNIPPET where PAGEID='+info.split(':')[1])
-        else:
+        elif 'select' in info:
+            print("What info is: ",info)
             qb.insert(0,info)
+        else:
+            qb.insert(0,'select SNIPPET where PAGEID='+info)
 
-        qb.pack(side='top')
+        #qb.pack(side='bottom',anchor='e')
+        
+        
+
         t2 = qb.get()
-        run = tk.Button(self.videoPane,text="run",command=lambda e=qb: self.queryEng(e))
-        run.pack(side='top',anchor='ne')
+        run = tk.Button(header,text="run",command=lambda e=qb: self.queryEng(e))
+        #run = tk.Button(self.videoPane,text="run",command=lambda: self.queryEng(qb))   
+        #run.pack(side='right',anchor='ne')
 
+        #showEditor = tk.Button(self.videoPane,text="^",command=lambda e=info: self.showButton(e))
+        showEditor = tk.Button(header,text="^",command=lambda: self.showButton(qb,run))
+        showEditor.pack(side='right',anchor='ne')
         #qb.pack(side='top')
         text = qb.get()
         #print("The text",text)  
@@ -196,7 +298,19 @@ class App(tk.Tk):
         text = qb.get()
         self.displayViewer(text)
 
-
+    def showButton(self,qb,run):
+        
+        print("SHOW BUTTON HERE")
+        
+        if self.showEditor == True:
+            qb.pack_forget()
+            run.pack_forget()
+            self.showEditor = False
+        else:
+            qb.pack()
+            run.pack()
+            self.showEditor = True
+            
     def displayCSV(self):
         for widget in self.videoPane.winfo_children():
             widget.destroy()    
@@ -208,52 +322,28 @@ class App(tk.Tk):
         self.scrollbar.pack(side='right',fill='y')
         self.t.configure(yscrollcommand=self.scrollbar.set)
         #mylist = tk.Listbox(self.videoPane,yscrollcommand=self.scrollbar.set)
-
-        #csvFile = pandas.read_csv('test.csv')
         #print(csvFile)
         count = 0
         with open('test.csv',newline='') as cs:
             s = csv.reader(cs,delimiter=',')
             #if count == 0:
             for title in s:
-                #print("The titles: ",title)
-                print("The final title: ",title[0])
+                print("The titles: ",title)
+                if len(title) >=2:
+                    print("The final title: ",title[0])
                 
 
-                #print("The other one: ",title[1])
-                print("The snippet ",title[2])
-                #self.videoPane.tkraise()
-                id2 = title[1]
-                bn = tk.Button(self.t,text=title[0],command=lambda e=id2: self.displayViewer(e))
-                bn.pack()
-                self.t.window_create("end",window=bn)
-                self.t.insert("end","\n")
-                #bn.pack()
-                #mylist.insert(tk.END,title[0])
-                #self.videoPane.attributes('-topmost', True)
-                #self.videoPane.attributes('-topmost', False)
-            #else:
-            #for val in s:
-            #print(val)
-            #self.nb.select(0)
+                    #print("The other one: ",title[1])
+                    #print("The snippet ",title[2])
+                    #self.videoPane.tkraise()
+                    id2 = title[1]
+                    bn = tk.Button(self.t,text=title[0],command=lambda e=id2: self.displayViewer(e))
+                    bn.pack()
+                    self.t.window_create("end",window=bn)
+                    self.t.insert("end","\n")
             count += 1
-        #mylist.pack(side='left',fill='both')
-        #self.scrollbar.config(command=mylist.yview)
-        #t.configure(state="disabled")
         self.t.pack(expand=1,side="left")
         self.nb.select(0)
-        #subprocess.call("ls")
-        #subprocess.call("cd model; ls")
-        #os.system("mv model/test.csv "+p2+"/pythonVersion")
-        # mv test.csv /Users/davidspiegel/git/videoConnector/src/model/pythonVersion
-        #os.chdir(path)
-        #os.system("python3 main.py")
-        #os.system("python3 main.py")
-                
-        #code = subprocess.call("mv model/test.csv "+view+"/pythonVersion")
-
-
-#top = tkinter.Tk()
 
 app = App()
 app.mainloop()
