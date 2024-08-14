@@ -20,18 +20,28 @@ class App(tk.Tk):
         
         self.Controller = Controller()
 
-        # A global font might be useful
+        # An instance variable might be good
         self.font = font.Font(family="Courier",size=20,weight=font.BOLD)
         self.font2 = font.Font(family="Courier",size=15,weight=font.BOLD)
 
+        # The color for the background
+        self.themes = {"dark": {"button": "black","frame": "gray"}
+                       ,"light": {"button": "blue","frame": "red"}}
+        buttonStyle = ttk.Style()
+        buttonStyle.configure("BW.TButton",foreground="white",background=self.themes["dark"]["button"])
+        frameStyle = ttk.Style()
+        frameStyle.configure("BW.TFrame",foreground="white",background=self.themes["dark"]["frame"])
+        #self.buttonTheme = self.themes["dark"]["button"]
+        #self.frameTheme = self.themes["dark"]["frame"]
+        self.config(bg=self.themes["dark"]["button"])
         # Attempting to make a notebook
         self.nb = ttk.Notebook(self)
         self.tempCon = "" 
         self.Connectors = {} # A Dictionary that will hold the name and the kind of connector
-        self.possibleConnectors = ["Wiki","WorldBank","Apple Music"]
+        self.possibleConnectors = ["Wiki","WorldBank","AppleMusic"]
 
-        self.videoPane = ttk.Frame(self.nb)
-        self.queryPane = ttk.Frame(self.nb)
+        self.videoPane = ttk.Frame(self.nb,style="BW.TFrame")
+        self.queryPane = ttk.Frame(self.nb, style="BW.TFrame")
         
         self.dbEng = dbEngine("HI")
         self.showEditor = False
@@ -82,7 +92,6 @@ class App(tk.Tk):
     
 
     def showSnippet(self,curId):
-        print("HI",curId)
         for widget in self.videoPane.winfo_children():
             widget.destroy()
 
@@ -146,7 +155,6 @@ class App(tk.Tk):
     
 
     def EnableConnector(self,con):
-        print("HI")
         #if self.Controller is not None:
         self.Controller.setConnector(con)
         self.curConLabel.config(text=con)
@@ -255,7 +263,7 @@ class App(tk.Tk):
 
         t = tk.Text(self.videoPane)
         scrollbar = tk.Scrollbar(self.videoPane,command=t.yview)
-        scrollbar.pack(side='right',fill='y')
+        scrollbar.pack(side='right',fill='both')
         t.configure(yscrollcommand=scrollbar.set)
 
 
@@ -280,13 +288,13 @@ class App(tk.Tk):
                     r3 += i3
                 print("What r3 is: ",r3)
                 label = tk.Label(t,text=r3,font=self.font2)
-                label.pack(side='bottom')
+                label.pack(side='left',expand=1,fill=tk.BOTH)
                 t.window_create("end",window=label)
                 t.insert("end","\n")
 
             else:
-                label = tk.Label(self.videoPane,text=val,font=self.font2)
-                label.pack(side='bottom')
+                label = tk.Label(self.videoPane,width=len(val),height=len(val),text=val,font=self.font2)
+                label.pack(side='left',anchor='nw')
                 t.window_create("end",window=label)
                 t.insert("end","\n")
         t.pack(expand=1,side="left")
@@ -300,7 +308,6 @@ class App(tk.Tk):
 
     def showButton(self,qb,run):
         
-        print("SHOW BUTTON HERE")
         
         if self.showEditor == True:
             qb.pack_forget()
