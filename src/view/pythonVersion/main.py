@@ -25,16 +25,30 @@ class App(tk.Tk):
         self.font2 = font.Font(family="Courier",size=15,weight=font.BOLD)
 
         # The color for the background
-        self.themes = {"dark": {"button": "black","frame": "gray"}
-                       ,"light": {"button": "blue","frame": "red"}}
-        buttonStyle = ttk.Style()
-        buttonStyle.configure("BW.TButton",foreground="white",background=self.themes["dark"]["button"])
+        self.themes = {"dark": 
+                        {"button": 
+                            {"foreground":"white","background":"black"}
+                        ,"frame": {"foreground":"white","background":"black"}
+                        ,"notebook":{"foreground":"white","background":"grey"}}
+                    ,"light": 
+                        {"button": 
+                            {"foreground":"black","background":"white"}
+                        ,"frame":
+                            {"foreground":"black","background":"white"}
+                        ,"notebook":
+                            {"foreground":"black","background":"grey"}}
+                        }
+        self.buttonStyle = ttk.Style()
+        self.buttonStyle.configure("BW.TButton",foreground=self.themes["light"]["button"]["foreground"],background=self.themes["light"]["button"]["background"])
 
-        frameStyle = ttk.Style()
-        frameStyle.configure("BW.TFrame",foreground="grey",background=self.themes["dark"]["frame"])
+        self.frameStyle = ttk.Style()
+        self.frameStyle.configure("BW.TFrame",foreground=self.themes["light"]["frame"]["foreground"],background=self.themes["light"]["frame"]["background"])
+
+        self.notebookStyle = ttk.Style()
+        self.notebookStyle.configure("BW.TNotebook",foreground=self.themes["light"]["notebook"]["foreground"],background=self.themes["light"]["notebook"]["background"])
         #self.buttonTheme = self.themes["dark"]["button"]
         #self.frameTheme = self.themes["dark"]["frame"]
-        self.config(bg=self.themes["dark"]["button"])
+        self.config(bg=self.themes["light"]["button"]["background"])
         # Attempting to make a notebook
         self.nb = ttk.Notebook(self)
         self.tempCon = "" 
@@ -53,6 +67,7 @@ class App(tk.Tk):
 
         self.nb.pack(expand=1,fill="both")
         self.nb.select(1)
+        self.nb.configure(style="BW.TNotebook")
         #self.f3 = ttk.Frame(self.nb)
         #self.nb.insert("end",self.f3,text="W3")
         #self.center(self)
@@ -64,14 +79,17 @@ class App(tk.Tk):
         
         self.curConLabel = tk.Label(self.queryPane,text=self.Controller.getConnector())
         #try:
-        i = Image.open("Assets/icon.png")
+        # MUST Get icons working!!
+        i = Image.open("icon.png")
         img = ImageTk.PhotoImage(i)    
         
             
         #except: 
         #    print("HERR")
-        imgLabel = tk.Label(self.queryPane,image=img,compound='center')
-        imgLabel.pack(expand=1,fill='both',anchor='nw')
+        imgLabel = tk.Label(self.queryPane)
+        imgLabel.config(image=img)
+        imgLabel.pack(expand=0,anchor='nw',side='bottom')
+        
         self.curConLabel.pack(side='top')
         # Text box for it
         self.queryBox = ttk.Entry(self.queryPane,width=10,font=self.font)
@@ -96,10 +114,29 @@ class App(tk.Tk):
         self.connectMenu.add_command(label="Add Connector",command=self.ShowConnectors)
         
 
+        # Making an icon for the pref and quit
+        self.connectPref = tk.Menu(self.menuBar,tearoff=0)
+        self.connectPref.add_command(label="Dark Mode",command=self.EnableDarkMode)
+        self.connectPref.add_command(label="Exit",command=self.exit)
+        self.menuBar.add_cascade(label="VC",menu=self.connectPref)        
         
         self.menuBar.add_cascade(label="Connectors",menu=self.connectMenu)
+        
+        
         self.config(menu=self.menuBar)
     
+    def EnableDarkMode(self):
+        print("DARK MODE")
+        self.frameStyle.configure("BW.TFrame",foreground=self.themes["dark"]["frame"]["foreground"],background=self.themes["dark"]["frame"]["background"])
+        self.buttonStyle.configure("BW.TButton",foreground=self.themes["dark"]["button"]["foreground"],background=self.themes["dark"]["button"]["background"])
+        
+        self.notebookStyle.configure("BW.TNotebook",foreground=self.themes["dark"]["notebook"]["foreground"],background=self.themes["dark"]["notebook"]["background"])
+
+        self.connectMenu.config(bg="black",fg="white")
+        self.connectPref.config(bg="black",fg="white")
+
+    def exit(self):
+        self.destroy()
 
     def showSnippet(self,curId):
         for widget in self.videoPane.winfo_children():
