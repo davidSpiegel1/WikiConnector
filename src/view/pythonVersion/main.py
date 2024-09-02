@@ -7,7 +7,7 @@ import subprocess
 #import pandas as pd
 from Controller.controller import *
 import csv
-
+from PIL import Image,ImageTk
 
 from dbEngine import *
 
@@ -29,8 +29,9 @@ class App(tk.Tk):
                        ,"light": {"button": "blue","frame": "red"}}
         buttonStyle = ttk.Style()
         buttonStyle.configure("BW.TButton",foreground="white",background=self.themes["dark"]["button"])
+
         frameStyle = ttk.Style()
-        frameStyle.configure("BW.TFrame",foreground="white",background=self.themes["dark"]["frame"])
+        frameStyle.configure("BW.TFrame",foreground="grey",background=self.themes["dark"]["frame"])
         #self.buttonTheme = self.themes["dark"]["button"]
         #self.frameTheme = self.themes["dark"]["frame"]
         self.config(bg=self.themes["dark"]["button"])
@@ -55,17 +56,26 @@ class App(tk.Tk):
         #self.f3 = ttk.Frame(self.nb)
         #self.nb.insert("end",self.f3,text="W3")
         #self.center(self)
-        B= tk.Button(self.queryPane,text="GO",command=self.show)
+        B= ttk.Button(self.queryPane,text="GO",style="BW.TButton",command=self.show)
 
         self.bind('<Return>',lambda e: self.show())
 
         B.pack(side='bottom')
         
         self.curConLabel = tk.Label(self.queryPane,text=self.Controller.getConnector())
-       
+        #try:
+        i = Image.open("Assets/icon.png")
+        img = ImageTk.PhotoImage(i)    
+        
+            
+        #except: 
+        #    print("HERR")
+        imgLabel = tk.Label(self.queryPane,image=img,compound='center')
+        imgLabel.pack(expand=1,fill='both',anchor='nw')
         self.curConLabel.pack(side='top')
         # Text box for it
         self.queryBox = ttk.Entry(self.queryPane,width=10,font=self.font)
+
 
           
         
