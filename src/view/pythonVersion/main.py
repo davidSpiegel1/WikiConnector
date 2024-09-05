@@ -80,15 +80,15 @@ class App(tk.Tk):
         self.curConLabel = tk.Label(self.queryPane,text=self.Controller.getConnector())
         #try:
         # MUST Get icons working!!
-        i = Image.open("icon.png")
-        img = ImageTk.PhotoImage(i)    
+        #i = Image.open("icon.png")
+        #img = ImageTk.PhotoImage(i)    
         
             
         #except: 
         #    print("HERR")
-        imgLabel = tk.Label(self.queryPane)
-        imgLabel.config(image=img)
-        imgLabel.pack(expand=0,anchor='nw',side='bottom')
+        #imgLabel = tk.Label(self.queryPane)
+        #imgLabel.config(image=img)
+        #imgLabel.pack(expand=0,anchor='nw',side='bottom')
         
         self.curConLabel.pack(side='top')
         # Text box for it
@@ -117,6 +117,7 @@ class App(tk.Tk):
         # Making an icon for the pref and quit
         self.connectPref = tk.Menu(self.menuBar,tearoff=0)
         self.connectPref.add_command(label="Dark Mode",command=self.EnableDarkMode)
+        self.connectPref.add_command(label="Prefrences",command=self.ShowPrefrences)
         self.connectPref.add_command(label="Exit",command=self.exit)
         self.menuBar.add_cascade(label="VC",menu=self.connectPref)        
         
@@ -134,7 +135,15 @@ class App(tk.Tk):
 
         self.connectMenu.config(bg="black",fg="white")
         self.connectPref.config(bg="black",fg="white")
-
+    def ShowPrefrences(self):
+        root = tk.Tk()
+        root.title("Prefrences")
+        root.attributes('-alpha',0.5)
+        v = tk.DoubleVar()
+        scale = tk.Scale(root,variable=v,from_=0,to=10,orient=tk.HORIZONTAL)
+        scale.pack(anchor=tk.CENTER) 
+        self.center(root)
+        root.mainloop()
     def exit(self):
         self.destroy()
 
