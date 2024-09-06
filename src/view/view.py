@@ -5,11 +5,12 @@ from tkinter import ttk,font
 import os
 import subprocess
 #import pandas as pd
-from Controller.controller import *
 import csv
 from PIL import Image,ImageTk
 
 from dbEngine import *
+from controller import controller
+#from model import AppleMusic,WikiSource,WorldBankSource,Entry
 
 class App(tk.Tk):
     def __init__(self):
@@ -18,7 +19,7 @@ class App(tk.Tk):
         self.title("Video Connector")
         self.center(self)
         
-        self.Controller = Controller()
+        self.Controller = controller.Controller()
 
         # An instance variable might be good
         self.font = font.Font(family="Courier",size=20,weight=font.BOLD)
@@ -387,7 +388,7 @@ class App(tk.Tk):
         #mylist = tk.Listbox(self.videoPane,yscrollcommand=self.scrollbar.set)
         #print(csvFile)
         count = 0
-        with open('test.csv',newline='') as cs:
+        with open('view/test.csv',newline='') as cs:
             s = csv.reader(cs,delimiter=',')
             #if count == 0:
             for title in s:
@@ -408,5 +409,3 @@ class App(tk.Tk):
         self.t.pack(expand=1,side="left")
         self.nb.select(0)
 
-app = App()
-app.mainloop()

@@ -212,7 +212,7 @@ class Query:
 
     def getColumn(self, columnName):
         columnList = []
-        with open('test.csv',newline='') as c:
+        with open('view/test.csv',newline='') as c:
             r = csv.reader(c,delimiter=',')
             for row in r:
                 if len(row) >= 3:
@@ -241,7 +241,7 @@ class Query:
         finalList = []
         print("s1: ",s1)
         print("s2: ",s2)
-        with open('test.csv',newline='') as c:
+        with open('view/test.csv',newline='') as c:
             r = csv.reader(c,delimiter=',')
             for row in r:
                 for a in s1:
