@@ -49,7 +49,7 @@ class App(tk.Tk):
         self.notebookStyle.configure("BW.TNotebook",foreground=self.themes["light"]["notebook"]["foreground"],background=self.themes["light"]["notebook"]["background"])
         #self.buttonTheme = self.themes["dark"]["button"]
         #self.frameTheme = self.themes["dark"]["frame"]
-        self.config(bg=self.themes["light"]["button"]["background"])
+        self.config(bg=self.themes["light"]["button"]["background"])#,font=self.font)
         # Attempting to make a notebook
         self.nb = ttk.Notebook(self)
         self.tempCon = "" 
@@ -89,8 +89,7 @@ class App(tk.Tk):
         #    print("HERR")
         #imgLabel = tk.Label(self.queryPane)
         #imgLabel.config(image=img)
-        #imgLabel.pack(expand=0,anchor='nw',side='bottom')
-        
+        #imgLabel.pack(expand=0,anchor='nw',side='bottom') 
         self.curConLabel.pack(side='top')
         # Text box for it
         self.queryBox = ttk.Entry(self.queryPane,width=10,font=self.font)
@@ -139,12 +138,67 @@ class App(tk.Tk):
     def ShowPrefrences(self):
         root = tk.Tk()
         root.title("Prefrences")
-        root.attributes('-alpha',0.5)
-        v = tk.DoubleVar()
-        scale = tk.Scale(root,variable=v,from_=0,to=10,orient=tk.HORIZONTAL)
-        scale.pack(anchor=tk.CENTER) 
+        #root.attributes('-alpha',1.0)
+        v = tk.IntVar(value=1.0)
+        scale = tk.Scale(root,variable=v,from_=0,to=100,orient=tk.HORIZONTAL)
+        scale.pack(anchor=tk.CENTER)
+        scale.bind("<ButtonRelease-1>",lambda e: root.attributes('-alpha',0.01*(100-scale.get())))
+        #scale.bind("<ButtonRelease-2>",lambda e: print("THE BUTTON SCALE: ",0.1*scale.get()))
+        
+        l = tk.Label(root,textvariable=v)
+        l.pack()
+        #scale.bind("<ButtonRelease-2>",lambda e: l.config(text=str(100-v.get())))
+        #l.pack()
+
+        font = tk.Label(root,text="Font")
+        font.pack()
+
+
+        # Possible fonts:
+        options = []
+        print("ALL the FONT familes!!",tk.font.families())
+        for i in tk.font.families():
+            options.append(i)
+        clicked = tk.StringVar(root)
+        clicked.set(self.font.actual()['family'])
+
+        drop = tk.OptionMenu(root,clicked,*options)
+        drop.bind("<ButtonRelease-1>",lambda e: l.config(font=self.font))
+        drop.pack()
+
+
+        
+        # Doing the font size
+        fontSize = tk.Label(root,text="Font Size: ")
+        fontSize.pack()
+        fsize = [15,20,25,30]
+        hit = tk.IntVar(root)
+        hit.set(15)
+
+        fs = tk.OptionMenu(root,hit,*fsize)
+        fs.pack()
+
+
+
+
+
+
+
+        #apply = tk.Button(root,text="Apply",command=lambda e=scale: self.attributes('-alpha',0.01*(100-e.get())))
+        apply = tk.Button(root,text="Apply",command=lambda e=[scale,clicked,hit]: self.setSettings(e[0],e[1],e[2]))
+        
+        apply.pack()
+
+
         self.center(root)
         root.mainloop()
+
+    def setSettings(self,scale,clicked,hit):
+        self.attributes('-alpha',0.01*(100-scale.get()))
+        self.font.configure(family=clicked.get(),size=hit.get()+5)
+        self.font2.configure(family=clicked.get(),size=hit.get())
+        print("The value inside: ",hit.get())
+        
     def exit(self):
         self.destroy()
 
@@ -231,42 +285,11 @@ class App(tk.Tk):
         win.deiconify()
 
     def show(self):
-        #for widget in self.videoPane.winfo_children():
-        #   widget.destroy()    
-        #Make the scroll bar
-        #if self.t is not None:
-        #   self.t.delete('title',tk.END)
-        #self.t = tk.Text(self.videoPane)
-        #self.scrollbar = tk.Scrollbar(self.videoPane,command=self.t.yview)
-        #self.scrollbar.pack(side='right',fill='y')
-        #self.t.configure(yscrollcommand=self.scrollbar.set)
-        #mylist = tk.Listbox(self.videoPane,yscrollcommand=self.scrollbar.set)
         
-        
-
         text = self.queryBox.get()
 
         
         self.Controller.query(text)
-        #print(":",text)
-        #path = os.path.abspath(os.getcwd())+"/pythonVersion"
-        """os.chdir('../') 
-        os.chdir('../')
-        path = os.listdir()
-        p2 = os.path.abspath(os.getcwd())
-        model = p2+"/model"
-        view = p2+"/view"
-        #p = os.path.abspath(os.getcwd())+"/view"
-        os.chdir(model)
-        path2 = os.listdir()
-        #print("Files: ",path2)
-        #print("Path: ",p2)
-        #os.system("python3 WikiSource.py Mike")
-        #subprocess.call("python3 WikiSource.py Mike")
-        os.system("python3 WikiSource.py "+text+"; mv test.csv "+view+"/pythonVersion")
-        os.chdir("../")
-        os.chdir("view/pythonVersion")
-        #print("The dir",os.listdir())"""
 
         self.displayCSV()
 
