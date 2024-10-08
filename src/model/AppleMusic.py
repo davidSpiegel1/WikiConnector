@@ -27,10 +27,18 @@ def search( message ):
 
         for answer in r:
             print("Entry: ",answer)
-            
-            title = "TITLE: "+str(answer["trackName"])
-            nameid = "PAGEID: "+str(answer["trackId"])
-            description = "SNIPPET: "+" artist name: "+str(answer["artistName"])+"\nn track name: "+str(answer["trackName"])+"\n release date: "+str(answer["releaseDate"])
+            if "trackName" in answer:
+                title = "TITLE: "+str(answer["trackName"])
+            else:
+                title = "TITLE: ERR. NOT FOUND"
+            if "trackId" in answer:
+                nameid = "PAGEID: "+str(answer["trackId"])
+            else:
+                nameid = "PAGEID: ERR. NOT FOUND"
+            if "artistName" in answer and "releaseDate" in answer and "trackName" in answer:
+                description = "SNIPPET: "+" artist name: "+str(answer["artistName"])+"\nn track name: "+str(answer["trackName"])+"\n release date: "+str(answer["releaseDate"])
+            else:
+                description = "SNIPPET: ERR. NOT FOUND"
 
             finalBit.append({"title":title.replace(",",""),"pageid":nameid.replace(",",""),"snippet":description.replace(",","")})
         print(finalBit)

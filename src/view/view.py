@@ -10,13 +10,14 @@ from PIL import Image,ImageTk
 
 from dbEngine import *
 from controller import controller
+from json import load
 #from model import AppleMusic,WikiSource,WorldBankSource,Entry
 
 class App(tk.Tk):
     def __init__(self):
         super().__init__()
         #self.geometry("200x200")
-        self.title("Video Connector")
+        self.title("Wiki Connector")
         self.center(self)
         
         self.Controller = controller.Controller()
@@ -24,34 +25,60 @@ class App(tk.Tk):
         # An instance variable might be good
         self.font = font.Font(family="Courier",size=20,weight=font.BOLD)
         self.font2 = font.Font(family="Courier",size=15,weight=font.BOLD)
-
+       
+        self.themeLabel = "light"
+        
         # The color for the background
         self.themes = {"dark": 
                         {"button": 
-                            {"foreground":"white","background":"black"}
-                        ,"frame": {"foreground":"white","background":"black"}
-                        ,"notebook":{"foreground":"white","background":"grey"}}
+                            {"foreground":"#81a1c1","background":"#4c566a"}
+                        ,"frame": 
+                            {"foreground":"#81a1c1","background":"#4c566a"}
+                        ,"notebook":{
+                            "foreground":"#81a1c1","background":"#4c566a"}}
                     ,"light": 
                         {"button": 
-                            {"foreground":"black","background":"white"}
+                            {"foreground":"#5e81ac","background":"#81a1c1"}
                         ,"frame":
-                            {"foreground":"black","background":"white"}
+                            {"foreground":"#88c0d0","background":"#81a1c1"}
                         ,"notebook":
-                            {"foreground":"black","background":"grey"}}
-                        }
+                            {"foreground":"black","background":"#d8dee9"}
+                        }}
         self.buttonStyle = ttk.Style()
-        self.buttonStyle.configure("BW.TButton",foreground=self.themes["light"]["button"]["foreground"],background=self.themes["light"]["button"]["background"])
 
+        # Going to try to use 'theme_use' for the button style
+        #self.buttonStyle.configure("BW.TButton",foreground=self.themes["light"]["button"]["foreground"],background=self.themes["light"]["button"]["background"])
+            
+        try:
+            self.buttonStyle.theme_create("d",parent="clam",settings=load(open("view/assets/nordTheme/nordicButton.json")))
+            self.buttonStyle.theme_create("e",parent="clam",settings=load(open("view/assets/nordTheme/nordicButtonDark.json")))
+            self.buttonStyle.theme_use("d")
+        except:
+            print("Error. Loading asset theme did not work")
+        #self.tk.call('source', 'view/waldorf.tcl')
+        #self.buttonStyle.theme_use('waldorf') 
+        """self.buttonStyle.theme_create("dark",parent="alt")
+        self.buttonStyle.configure("BW.TButton",foreground=self.themes["dark"]["button"]["foreground"],background=self.themes["dark"]["button"]["background"])"""
+
+        
         self.frameStyle = ttk.Style()
-        self.frameStyle.configure("BW.TFrame",foreground=self.themes["light"]["frame"]["foreground"],background=self.themes["light"]["frame"]["background"])
-
+        #self.frameStyle.configure("BW.TFrame",foreground=self.themes["light"]["frame"]["foreground"],background=self.themes["light"]["frame"]["background"])
+        
+        try:
+            self.frameStyle.theme_create("f",parent="clam",settings=load(open("view/assets/nordTheme/nordicFrame.json")))
+            self.frameStyle.theme_create("fd",parent="clam",settings=load(open("view/assets/nordTheme/nordicFrameDark.json")))
+            self.frameStyle.theme_use("f")
+        except:
+            print("Error. Loading asset theme did not work")
         self.notebookStyle = ttk.Style()
+
+
         self.notebookStyle.configure("BW.TNotebook",foreground=self.themes["light"]["notebook"]["foreground"],background=self.themes["light"]["notebook"]["background"])
         #self.buttonTheme = self.themes["dark"]["button"]
         #self.frameTheme = self.themes["dark"]["frame"]
         self.config(bg=self.themes["light"]["button"]["background"])#,font=self.font)
         # Attempting to make a notebook
-        self.nb = ttk.Notebook(self)
+        self.nb = ttk.Notebook(self,style="BW.TNotebook")
         self.tempCon = "" 
         self.Connectors = {} # A Dictionary that will hold the name and the kind of connector
         self.possibleConnectors = ["Wiki","WorldBank","AppleMusic"]
@@ -72,19 +99,34 @@ class App(tk.Tk):
         #self.f3 = ttk.Frame(self.nb)
         #self.nb.insert("end",self.f3,text="W3")
         #self.center(self)
-        B= ttk.Button(self.queryPane,text="GO",style="BW.TButton",command=self.show)
+        try:
+            pi2 = Image.open("view/assets/go.png")
+            i2 = pi2.resize((int(self.winfo_width()*0.05),int(self.winfo_height()*0.05)))
+            img2 = ImageTk.PhotoImage(pi2)
+        except:
+            print("ERROR: NO ASSET go.png")
+        B= ttk.Button(self.queryPane,image=img2,style="BW.TButton",command=self.show)
+        B.image = img2
 
         self.bind('<Return>',lambda e: self.show())
 
         B.pack(side='bottom')
         
-        self.curConLabel = tk.Label(self.queryPane,text=self.Controller.getConnector())
+        self.curConLabel = ttk.Label(self.queryPane,text=self.Controller.getConnector())
         #try:
         # MUST Get icons working!!
-        #i = Image.open("icon.png")
-        #img = ImageTk.PhotoImage(i)    
-        
-            
+        try:
+            pi = Image.open("view/assets/icon.png")
+        except:
+            print("Error. Could not load asset icon.png")
+        #height = win.winfo_height()
+        #print("What the width is: ",self.winfo_width())
+        i = pi.resize((int(self.winfo_width()*0.20),int(self.winfo_height()*0.20))) 
+        #img = ImageTk.PhotoImage(i.convert('RGB')) 
+        img = ImageTk.PhotoImage(i)
+        l3 = tk.Label(self.queryPane,image=img)
+        l3.image = img
+        l3.pack()    
         #except: 
         #    print("HERR")
         #imgLabel = tk.Label(self.queryPane)
@@ -127,14 +169,26 @@ class App(tk.Tk):
         self.config(menu=self.menuBar)
     
     def EnableDarkMode(self):
-        print("DARK MODE")
-        self.frameStyle.configure("BW.TFrame",foreground=self.themes["dark"]["frame"]["foreground"],background=self.themes["dark"]["frame"]["background"])
-        self.buttonStyle.configure("BW.TButton",foreground=self.themes["dark"]["button"]["foreground"],background=self.themes["dark"]["button"]["background"])
-        
-        self.notebookStyle.configure("BW.TNotebook",foreground=self.themes["dark"]["notebook"]["foreground"],background=self.themes["dark"]["notebook"]["background"])
 
-        self.connectMenu.config(bg="black",fg="white")
-        self.connectPref.config(bg="black",fg="white")
+        if self.themeLabel == 'light':
+            print("DARK MODE")
+            #self.frameStyle.configure("BW.TFrame",foreground=self.themes["dark"]["frame"]["foreground"],background=self.themes["dark"]["frame"]["background"])
+            #self.buttonStyle.theme_use("Adapta")
+            #self.buttonStyle.configure("BW.TButton",foreground=self.themes["dark"]["button"]["foreground"],background=self.themes["dark"]["button"]["background"])
+            self.frameStyle.theme_use("f")
+            self.buttonStyle.theme_use("d")
+            self.notebookStyle.configure("BW.TNotebook",foreground=self.themes["dark"]["notebook"]["foreground"],background=self.themes["dark"]["notebook"]["background"])
+
+            self.connectMenu.config(bg="black",fg="white")
+            self.connectPref.config(bg="black",fg="white")
+            self.themeLabel = 'dark'
+
+        elif self.themeLabel == 'dark':
+            print("Light mode")
+            #self.buttonStyle.theme_create("e",parent="clam",settings=load(open("view/assets/nordTheme/nordicButtonDark.json")))
+            self.frameStyle.theme_use("fd")
+            self.buttonStyle.theme_use("e")
+            self.themeLabel = 'light'
     def ShowPrefrences(self):
         root = tk.Tk()
         root.title("Prefrences")
@@ -156,7 +210,7 @@ class App(tk.Tk):
 
         # Possible fonts:
         options = []
-        print("ALL the FONT familes!!",tk.font.families())
+        #print("ALL the FONT familes!!",tk.font.families())
         for i in tk.font.families():
             options.append(i)
         clicked = tk.StringVar(root)
@@ -188,8 +242,6 @@ class App(tk.Tk):
         apply = tk.Button(root,text="Apply",command=lambda e=[scale,clicked,hit]: self.setSettings(e[0],e[1],e[2]))
         
         apply.pack()
-
-
         self.center(root)
         root.mainloop()
 

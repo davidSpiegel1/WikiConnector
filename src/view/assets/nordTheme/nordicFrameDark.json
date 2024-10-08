@@ -1,0 +1,15 @@
+{
+	"TFrame" : {
+		"configure" : {
+			"foreground" : "#d8dee9"
+		
+			,"background" : "#4c566a"
+			,"font": ["melo",15]
+		}
+	}
+
+
+
+
+
+}

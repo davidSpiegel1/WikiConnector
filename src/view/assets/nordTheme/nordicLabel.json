@@ -1,0 +1,10 @@
+{
+    "TLabel": {
+        "configure": {
+            "background": "#d8dee9"
+	   ,"foreground" : "#434c5e"
+	   ,"font": ["melo",15]
+            }
+        }
+    }
+}

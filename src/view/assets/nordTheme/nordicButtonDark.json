@@ -1,0 +1,15 @@
+{
+	"TButton" : {
+		"configure" : {
+			"foreground" : "#d8dee9"
+		
+			,"background" : "#434c5e"
+			,"font": ["melo",15]
+		}
+	}
+
+
+
+
+
+}
