@@ -16,5 +16,5 @@ Simply clone the most recent version. Run the ``main.py`` file within the ``src`
 * Queries this file using a query language developed by myself.
 
 ## Updates
-* added a query editor to the application
-* Made the readme
+* Added ability to switch between connectors.
+* Added a query editor to the application
