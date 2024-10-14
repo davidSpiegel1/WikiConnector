@@ -1,15 +1,26 @@
 {
-	"TFrame" : {
-		"configure" : {
-			"foreground" : "#434c5e"
-		
-			,"background" : "#d8dee9"
-			,"font": ["melo",15]
-		}
-	}
+    "TFrame": {
 
-
-
-
-
+	 "map": {
+      	"background": [
+        		["!active", "lightblue"],
+        		["active", "blue"]
+      	]
+    	},
+        "configure": {
+           "background": "lightblue",
+      	  "borderwidth": 2,
+      	  "relief": "solid"
+            }
+        },
+    	"map": {
+      "background": [
+        ["active", "lightblue"],
+        ["!active", "white"]
+      ],
+      "foreground": [
+        ["active", "black"],
+        ["!active", "blue"]
+      ]
+    }
 }

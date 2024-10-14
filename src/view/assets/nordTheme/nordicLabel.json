@@ -1,10 +1,19 @@
 {
     "TLabel": {
         "configure": {
-            "background": "#d8dee9"
+            "background": "#5e81ac"
 	   ,"foreground" : "#434c5e"
 	   ,"font": ["melo",15]
             }
-        }
+        },
+    	"map": {
+      "background": [
+        ["active", "lightblue"],
+        ["!active", "white"]
+      ],
+      "foreground": [
+        ["active", "black"],
+        ["!active", "blue"]
+      ]
     }
 }

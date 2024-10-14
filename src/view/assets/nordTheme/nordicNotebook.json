@@ -1,0 +1,56 @@
+{
+    "TNotebook": {
+        "configure": {
+            "background" : "#5e81ac"
+	    ,"foreground" : "#434c5e"
+	    ,"font": ["melo",15]
+            }
+        }
+	,"TNotebook.Tab": {
+			"configure" : { 
+				"background" : "#81a1c1" 
+				,"foreground" : "#2e3440"
+	    			,"font": ["melo",15]
+				     }
+			 ,"map" : {
+					"background" : [
+						["active","#5e81ac"],
+						["!active","#81a1c1"]
+					]
+					,"foreground" : [
+						["active","#d8dee9"],
+						["!active","#2e3440"]
+					]
+				}
+			}
+
+	,"Custom.TButton": {
+			"configure" : { 
+				"background" : "#81a1c1" 
+				,"foreground" : "#2e3440"
+	    			,"font": ["melo",15]
+				     }
+			 ,"map" : {
+					"background" : [
+						["active","#81a1c1"],
+						["!active","#5e81ac"]
+					]
+					,"foreground" : [
+						["active","#d8dee9"],
+						["!active","#2e3440"]
+					]
+				}
+
+
+			}
+
+	,"TLabel" : {
+
+			"configure" : {
+					"background" : "#5e81ac"
+
+				}
+		}
+	
+    }
+

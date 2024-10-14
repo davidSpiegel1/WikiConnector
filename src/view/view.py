@@ -6,6 +6,7 @@ import os
 import subprocess
 #import pandas as pd
 import csv
+import traceback
 from PIL import Image,ImageTk
 
 from dbEngine import *
@@ -44,75 +45,84 @@ class App(tk.Tk):
                         ,"notebook":
                             {"foreground":"black","background":"#d8dee9"}
                         }}
-        self.buttonStyle = ttk.Style()
+        self.style = ttk.Style()
 
         # Going to try to use 'theme_use' for the button style
         #self.buttonStyle.configure("BW.TButton",foreground=self.themes["light"]["button"]["foreground"],background=self.themes["light"]["button"]["background"])
             
-        try:
-            self.buttonStyle.theme_create("d",parent="clam",settings=load(open("view/assets/nordTheme/nordicButton.json")))
-            self.buttonStyle.theme_create("e",parent="clam",settings=load(open("view/assets/nordTheme/nordicButtonDark.json")))
-            self.buttonStyle.theme_use("d")
-        except:
-            print("Error. Loading asset theme did not work")
-        #self.tk.call('source', 'view/waldorf.tcl')
-        #self.buttonStyle.theme_use('waldorf') 
-        """self.buttonStyle.theme_create("dark",parent="alt")
-        self.buttonStyle.configure("BW.TButton",foreground=self.themes["dark"]["button"]["foreground"],background=self.themes["dark"]["button"]["background"])"""
-
         
-        self.frameStyle = ttk.Style()
-        #self.frameStyle.configure("BW.TFrame",foreground=self.themes["light"]["frame"]["foreground"],background=self.themes["light"]["frame"]["background"])
-        
-        try:
+        """try:
             self.frameStyle.theme_create("f",parent="clam",settings=load(open("view/assets/nordTheme/nordicFrame.json")))
             self.frameStyle.theme_create("fd",parent="clam",settings=load(open("view/assets/nordTheme/nordicFrameDark.json")))
             self.frameStyle.theme_use("f")
-        except:
-            print("Error. Loading asset theme did not work")
-        self.notebookStyle = ttk.Style()
-
-
-        self.notebookStyle.configure("BW.TNotebook",foreground=self.themes["light"]["notebook"]["foreground"],background=self.themes["light"]["notebook"]["background"])
+        except Exception as e:
+            print("Error. Loading asset frame theme did not work",e)
+        """
+        #self.notebookStyle = ttk.Style()
+        try:
+            self.style.theme_create("n",parent="clam",settings=load(open("view/assets/nordTheme/nordicNotebook.json")))
+            self.style.theme_create("nd",parent="clam",settings=load(open("view/assets/nordTheme/nordicNotebookDark.json")))
+            self.style.theme_use("n")
+        #self.notebookStyle.configure("BW.TNotebook",foreground=self.themes["light"]["notebook"]["foreground"],background=self.themes["light"]["notebook"]["background"])
+        except Exception as e:
+            print("Error. Loading asset notebook theme did not work",e)
+            traceback.print_exc()
         #self.buttonTheme = self.themes["dark"]["button"]
         #self.frameTheme = self.themes["dark"]["frame"]
-        self.config(bg=self.themes["light"]["button"]["background"])#,font=self.font)
+        #self.config(bg=self.themes["light"]["button"]["background"])#,font=self.font)
         # Attempting to make a notebook
-        self.nb = ttk.Notebook(self,style="BW.TNotebook")
+        self.nb = ttk.Notebook(self,style="TNotebook")
+
+        # Needed connector information
         self.tempCon = "" 
         self.Connectors = {} # A Dictionary that will hold the name and the kind of connector
         self.possibleConnectors = ["Wiki","WorldBank","AppleMusic"]
 
-        self.videoPane = ttk.Frame(self.nb,style="BW.TFrame")
-        self.queryPane = ttk.Frame(self.nb, style="BW.TFrame")
+        self.videoPane = tk.Frame(self.nb,background=self.style.lookup("TNotebook","background"))#,style="TFrame")
+        self.queryPane = tk.Frame(self.nb,background=self.style.lookup("TNotebook","background")) #style="TFrame")
         
         self.dbEng = dbEngine("HI")
         self.showEditor = False
         self.videoPane.pack(fill=tk.BOTH,expand=True)
         self.queryPane.pack(fill=tk.BOTH,expand=True)
+        #self.videoPane.configure(style="TFrame")
         self.nb.add(self.videoPane,text="Video")
         self.nb.add(self.queryPane,text="Query")
 
         self.nb.pack(expand=1,fill="both")
         self.nb.select(1)
-        self.nb.configure(style="BW.TNotebook")
+        self.nb.configure(style="TNotebook")
         #self.f3 = ttk.Frame(self.nb)
         #self.nb.insert("end",self.f3,text="W3")
         #self.center(self)
+        img2 = None
         try:
-            pi2 = Image.open("view/assets/go.png")
-            i2 = pi2.resize((int(self.winfo_width()*0.05),int(self.winfo_height()*0.05)))
+            pi2 = Image.open("view/assets/search2.png")
+            i2 = pi2.resize((int(self.winfo_width()*0.01),int(self.winfo_height()*0.01)))
             img2 = ImageTk.PhotoImage(pi2)
         except:
             print("ERROR: NO ASSET go.png")
-        B= ttk.Button(self.queryPane,image=img2,style="BW.TButton",command=self.show)
+        #B= ttk.Button(self.queryPane,image=img2,command=self.show,style="C.TButton")
+        #B = tk.Button(self.queryPane,command=self.show,text="Go",bg="lightblue", fg="black",highlightbackground="lightblue", relief="flat")
+            # Switch to a theme that allows more customization
+        #style = ttk.Style()
+        #style.theme_use('clam')
+
+       # Define the button style
+        #style.configure('Custom.TButton', background='lightblue', foreground='black', font=('Helvetica', 12))
+        #try:
+    # Create a ttk.Button with the new style
+        B = ttk.Button(self.queryPane,image=img2, text="Styled ttk.Button", style='Custom.TButton')
+        #button.pack(padx=10, pady=10)
+        #B.configure(style="TButton")
+        # ,image=img2
         B.image = img2
 
         self.bind('<Return>',lambda e: self.show())
-
+        #B.bind("<Enter>",lambda e: .config(background="black"))
         B.pack(side='bottom')
         
-        self.curConLabel = ttk.Label(self.queryPane,text=self.Controller.getConnector())
+        self.curConLabel = ttk.Label(self.queryPane,text=self.Controller.getConnector(),style="TLabel")
         #try:
         # MUST Get icons working!!
         try:
@@ -124,9 +134,10 @@ class App(tk.Tk):
         i = pi.resize((int(self.winfo_width()*0.20),int(self.winfo_height()*0.20))) 
         #img = ImageTk.PhotoImage(i.convert('RGB')) 
         img = ImageTk.PhotoImage(i)
-        l3 = tk.Label(self.queryPane,image=img)
+        l3 = ttk.Label(self.queryPane,image=img,style="TLabel")
         l3.image = img
-        l3.pack()    
+        l3.pack()   
+
         #except: 
         #    print("HERR")
         #imgLabel = tk.Label(self.queryPane)
@@ -134,7 +145,7 @@ class App(tk.Tk):
         #imgLabel.pack(expand=0,anchor='nw',side='bottom') 
         self.curConLabel.pack(side='top')
         # Text box for it
-        self.queryBox = ttk.Entry(self.queryPane,width=10,font=self.font)
+        self.queryBox = tk.Entry(self.queryPane,width=10,font=self.font,foreground="#2e3440",background="#81a1c1")
 
 
           
@@ -171,23 +182,32 @@ class App(tk.Tk):
     def EnableDarkMode(self):
 
         if self.themeLabel == 'light':
-            print("DARK MODE")
+            print("Dark mode")
             #self.frameStyle.configure("BW.TFrame",foreground=self.themes["dark"]["frame"]["foreground"],background=self.themes["dark"]["frame"]["background"])
             #self.buttonStyle.theme_use("Adapta")
             #self.buttonStyle.configure("BW.TButton",foreground=self.themes["dark"]["button"]["foreground"],background=self.themes["dark"]["button"]["background"])
-            self.frameStyle.theme_use("f")
-            self.buttonStyle.theme_use("d")
-            self.notebookStyle.configure("BW.TNotebook",foreground=self.themes["dark"]["notebook"]["foreground"],background=self.themes["dark"]["notebook"]["background"])
-
+            #self.frameStyle.theme_use("f")
+            #self.buttonStyle.theme_use("b")
+            self.style.theme_use("n")
+            #self.notebookStyle.configure("BW.TNotebook",foreground=self.themes["dark"]["notebook"]["foreground"],background=self.themes["dark"]["notebook"]["background"])
+            self.queryBox.config(foreground="#2e3440",background="#81a1c1")
             self.connectMenu.config(bg="black",fg="white")
             self.connectPref.config(bg="black",fg="white")
+
+
+            self.videoPane.config(background=self.style.lookup("TNotebook","background"))#,style="TFrame")
+            self.queryPane.config(background=self.style.lookup("TNotebook","background")) 
             self.themeLabel = 'dark'
 
         elif self.themeLabel == 'dark':
             print("Light mode")
             #self.buttonStyle.theme_create("e",parent="clam",settings=load(open("view/assets/nordTheme/nordicButtonDark.json")))
-            self.frameStyle.theme_use("fd")
-            self.buttonStyle.theme_use("e")
+            #self.frameStyle.theme_use("fd")
+            #self.buttonStyle.theme_use("bd")
+            self.style.theme_use("nd")
+            self.queryBox.config(foreground="#d8dee9",background="#2e3440")
+            self.videoPane.config(background=self.style.lookup("TNotebook","background"))#,style="TFrame")
+            self.queryPane.config(background=self.style.lookup("TNotebook","background")) 
             self.themeLabel = 'light'
     def ShowPrefrences(self):
         root = tk.Tk()
@@ -353,7 +373,7 @@ class App(tk.Tk):
         
         header = tk.Frame(self.videoPane)
         header.pack(side='top')
-        backbut = tk.Button(header,text="<",command=self.displayCSV)
+        backbut = ttk.Button(header,text="<",command=self.displayCSV,style="Custom.TButton")
         backbut.pack(side='left',anchor='nw')
         
         
@@ -377,12 +397,12 @@ class App(tk.Tk):
         
 
         t2 = qb.get()
-        run = tk.Button(header,text="run",command=lambda e=qb: self.queryEng(e))
+        run = ttk.Button(header,text="run",command=lambda e=qb: self.queryEng(e),style="Custom.TButton")
         #run = tk.Button(self.videoPane,text="run",command=lambda: self.queryEng(qb))   
         #run.pack(side='right',anchor='ne')
 
         #showEditor = tk.Button(self.videoPane,text="^",command=lambda e=info: self.showButton(e))
-        showEditor = tk.Button(header,text="^",command=lambda: self.showButton(qb,run))
+        showEditor = ttk.Button(header,text="^",command=lambda: self.showButton(qb,run),style="Custom.TButton")
         showEditor.pack(side='right',anchor='ne')
         #qb.pack(side='top')
         text = qb.get()
@@ -476,7 +496,7 @@ class App(tk.Tk):
                     #print("The snippet ",title[2])
                     #self.videoPane.tkraise()
                     id2 = title[1]
-                    bn = tk.Button(self.t,text=title[0],command=lambda e=id2: self.displayViewer(e))
+                    bn = ttk.Button(self.t,text=title[0],style="Custom.TButton",command=lambda e=id2: self.displayViewer(e))
                     bn.pack()
                     self.t.window_create("end",window=bn)
                     self.t.insert("end","\n")
