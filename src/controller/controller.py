@@ -3,7 +3,7 @@ import os
 import subprocess
 #import pandas as pd
 import csv
-from model import webViewBrowser
+#from model import webViewBrowser
 #from model import GoogleSource
 from model import Terminal
 import tkinter as tk
