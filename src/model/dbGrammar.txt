@@ -1,0 +1,20 @@
+# Extemded backus naur form
+# EBNF
+
+
+# Going to extend this to allow for system calls
+statement := select | bash
+
+bash := command
+command := 'ls' { argument } | 'cd' { argument } | 'rm' argument | 'echo' argument
+argument := argument { ' ' argument }
+argument := ID
+
+select := 'select' expression [ whereExpr ]
+whereExpr := 'where' condition
+condtion := ID comp expression
+comp := '<' | '>' | '=' | '!=' | '>=' | '<='
+expression := (expression) { ',' expression } | condition | INT
+
+
+

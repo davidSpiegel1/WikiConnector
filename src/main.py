@@ -8,7 +8,8 @@ sys.path.append("model")
 import view
 import dbEngine 
 from model import Entry
-
+from model import dbEngine
+#from view import customNotebook
 
 app = view.App()
 app.mainloop()

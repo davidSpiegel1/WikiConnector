@@ -24,7 +24,7 @@
 				}
 			}
 
-	,"Custom.TButton": {
+	,"CustomNotebook.Tab": {
 			"configure" : { 
 				"background" : "#81a1c1" 
 				,"foreground" : "#2e3440"
@@ -44,7 +44,54 @@
 
 			}
 
+	,"Custom.TButton": {
+			"configure" : { 
+				"background" : "#81a1c1" 
+				,"foreground" : "#2e3440"
+	    			,"font": ["melo",20]
+				     }
+			 ,"map" : {
+					"background" : [
+						["active","#81a1c1"],
+						["!active","#5e81ac"]
+					]
+					,"foreground" : [
+						["active","#d8dee9"],
+						["!active","#2e3440"]
+					]
+				}
+
+
+	}
+	,"TCombobox.button": {
+			"configure" : { 
+				"background" : "#d8dee9" 
+				,"foreground" : "#2e3440"
+	    			,"font": ["melo",20]
+				     }
+
+	}
+	,"TCombobox": {
+			"configure" : { 
+				"background" : "#81a1c1" 
+				,"foreground" : "#2e3440"
+				,"fieldbackground" : "#81a1c1"
+				,"selectbackground" : "#d8dee9"
+	    			,"font": ["melo",20]
+				,"width": 10
+				     }
+
+	}	
+	
+
 	,"TLabel" : {
+
+			"configure" : {
+					"background" : "#5e81ac"
+
+				}
+		}
+	,"TFrame" : {
 
 			"configure" : {
 					"background" : "#5e81ac"
