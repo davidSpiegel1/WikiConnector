@@ -8,13 +8,14 @@ Desktop application that involves connecting to various packaged APIs called _co
 
 
 ## Installation
-Simply clone the most recent version. Run the ``main.py`` file within the ``src`` directory.
+Clone the most recent version. Run the ``Main.py`` file within the ``src`` directory.
 
 ## How It Works
 * Makes API calls that are dependent on the _connector_ that is being used.
-* Utilizes a CSV file to aggregate data that is treated as a temporary database.
+* Utilizes a CSV file to aggregate data treated as a temporary database.
 * Queries this file using a query language developed by myself.
 
 ## Updates
 * added a query editor to the application
 * Made the readme
+* Changed to PyQt5 gui lib. Also added bash-like features to query language.
