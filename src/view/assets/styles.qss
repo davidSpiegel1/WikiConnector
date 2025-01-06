@@ -1,0 +1,83 @@
+QWidget {
+    background-color: #5e81ac;
+    color: #e5e9f0;
+    font-weight: bold;
+    font-family: Arial;
+    font-size: 14px;
+}
+QTabWidget::tab-bar {
+                alignment: left; /* Align the tabs at the center */
+
+}
+
+QTabBar:tab{
+	background: #81a1c1;
+	border-radius: 5px;
+	border: 2px solid #4c566a;
+	/*margin: 4px;*/
+	min-width: 100px;
+}
+QTabBar::tab:hover {
+    background-color: #5e81ac;
+}
+
+QTabBar::tab:!selected {
+                margin-top: 0.75px; /* Offset non-selected tabs */
+	        margin-bottom: 0.75px;
+	        /*background: #7a98b6;*/
+		background: #7895b3;
+}
+
+QLabel {
+    color: #333333;
+    font-weight: bold;
+}
+
+QLineEdit {
+    background-color: #81a1c1;
+    color: #e5e9f0;
+    border: 3px solid #cccccc;
+    border-radius: 4px;
+    padding: 5px;
+}
+QLineEdit#Error {
+    /*background-color: #81a1c1;
+    color: #e5e9f0;*/
+    border: 3px solid red;
+    /*border-radius: 4px;
+    padding: 5px;*/
+}
+
+QPushButton#circularButton {
+    background-color: #81a1c1;
+    color: #d8dee9;
+    border: 2px solid white;
+    border-radius: 15px;
+    padding: 5px;
+}
+
+QPushButton {
+    background-color: #81a1c1;
+    color: #d8dee9;
+    border: 2px solid white;
+    border-radius: 15px;
+    padding: 5px;
+}
+
+QPushButton#circularButton:hover {
+    background-color: #5e81ac;
+}
+
+QPushButton#close {
+    background: transparent;
+    border: none;
+}
+
+QPushButton#close:hover {
+    color: #bf616a;
+}
+
+QPushButton:hover {
+    background-color: #5e81ac;
+}
+

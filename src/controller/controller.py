@@ -5,18 +5,31 @@ import subprocess
 import csv
 #from model import webViewBrowser
 #from model import GoogleSource
-from model import Terminal
-import tkinter as tk
+from model import terminal
+from model import settings
+#import tkinter as tk
 import threading
 
 
 class Controller:
-    def __init__(self):
-        
+    def __init__(self,kern):
+        self.kern = kern
         self.currentConnect = 'Wiki'
         self.possibleConnectors = {'Wiki','WorldBank','AppleMusic','WebViewBrowser'}
         self.google = None
         self.terminal = None
+
+    def getCurApps(self):
+        return self.kern.get_apps_name()
+
+    def runApp(self,appName):
+        print("Running: ",appName)
+        if appName=="programTest":
+            return self.kern.run_application(appName)
+        elif appName=="terminal":
+            return self.kern.run_application(appName,appName,self.kern)
+        elif appName in ("settings","fileManager"):
+            return self.kern.run_application(appName,appName,self.kern)
 
     def setConnector(self,connector):
         self.currentConnect = connector
@@ -71,6 +84,6 @@ class Controller:
     def queryApp(self,appName,parent_frame,dbEngine):
         #button = tk.Button(parent_frame,text="HI")
         #button.pack()
-        #print("HERE")
-        self.terminal = Terminal.Terminal(appName,parent_frame,dbEngine)
-        self.terminal.buildApp()
+        print("HERE")
+        #self.terminal = Terminal.Terminal(appName,parent_frame,dbEngine)
+        #self.terminal.buildApp()

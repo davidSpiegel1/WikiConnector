@@ -4,6 +4,83 @@
 * Must have bluetooth (Give packets of data between two computers - Share ability)
 * Must have 'Connectors' finally there.
 
+* Some Notes on Operating Systems:
+
+	* Wiki:
+		* Operating System (OS):
+			* System Software that manages computer hardware and software resources
+			* Time-sharing: Schedule tasks for efficient use of the system
+			* Acts as an intermediary between programs and the computer hardwar.
+		* Flow of operating system:
+			* User -> Application -> Operating System -> Hardware
+
+		* Definition and Purpose:
+			* Hard to define. 
+			* Software that is always running like the Kernel.
+			* Applications and System Programs
+		* Components:
+			* Kernel: 
+				* Part of OS that provides protection between different apps and users.
+				* Key to improving reliability 
+				* Security by limiting power of malicious software
+				* Two modes of operation:
+					* User mode:
+						* Hardware checks that the software is only excuting legal instrutions.
+					* Kernel mode:
+						* Unrestricted powers and not subject to checks.
+
+			* Program Execution:
+				* OS provides an interface between an application program and its computer.
+				* Executing a program:
+					* Creation of a process
+					* Assigns Memory space and recources.
+				* Interrupts:
+					* Gives a way to abort or 'trap' to give CPU 
+
+
+
+	* Youtube:
+		* Can use Assembly to start with building an OS:
+		* File System:
+			* A method of organizing pieces of data (files) on a disk
+			* could use FAT?
+		* The file system will have two four things (ON DISK):
+			* Reserved, File allocation tables, Root directory, Data
+				* Reserved: 
+					* For boot up. May not be needed.
+				* File allocation tables:
+					* A simple look up table.
+					* Entries hold the location of next cluster
+					* FFF represents the end of a file (End of chain).
+
+	* Youtube (2):
+		* Attempting to make a virtual file system:
+			* In linux, you have your Directory Tree
+			* You have your root (INode#1 - '/')
+			* You have your usr | home | etc | root | mnt<- (All INodes)
+			* When I 'Mount(mnt):' I can attach another file system. 
+
+	* I think I can make a file system (Attached, of course).
+	* I can make the bash program act like a Kernel.
+		* How I will do this is most likely with a main method. 
+		* Start with a basic compiler that will take a string of text and preform commands.
+			* this compiler should be able to run full programs
+			* One of these programs should be the desktop env.
+				Programs should be kept up with using a stack found in it.
+
+	* Linux Kernel Development (PDF):
+		* User INTERFACE is the OUTERMOST. KERNEL is the INNERMOST.
+		* A Kernel can be thought of as a 'supervisor'
+		* Typical Components of a kernel are:
+			* Service interrupt requests
+			* Interrupt handlers
+			* A scheduler to share processor time.
+		* The Kernel Runs in a higher level state called KERNEL-SPACE
+		* User applications run in USER-SPACE
+		* Remember: Interrupts literly interupt the processer.
+
+
+
 
 
 
