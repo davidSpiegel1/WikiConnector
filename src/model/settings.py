@@ -72,6 +72,7 @@ class settings(App):
 
         # Users
         users = qt.QPushButton("Users+Groups")
+        users.clicked.connect(self.userGroupsChange)
         self.grid.addWidget(users,4,1)
 
         # Sharing
@@ -93,7 +94,6 @@ class settings(App):
 
 
     def desktopChange(self):
-        print("Desktop change!")
         
         self.getDash()
         self.kern.get_file_system().switch_to_user_home(self.kern.get_current_user())
@@ -267,32 +267,114 @@ class settings(App):
         self.kern.get_file_system().switch_to_user_home(self.kern.get_current_user())
         print("The current theme: ",theme)
 
-    def fontChange(self):
-        print("Font change!")
+    def userGroupsChange(self):
+        print("User Groups change!")
+
         self.getDash()
 
-        self.font_list = qt.QComboBox()
+        if self.kern.get_current_user()==self.kern.get_file_system().get_root():
+            admin = qt.QLabel("Admin: ")
+            self.grid.addWidget(admin,1,1)
+            root = qt.QLabel(self.kern.get_file_system().get_root())
+            self.grid.addWidget(root,1,2)
 
-        self.grid.addWidget(self.font_list)
+            users = self.kern.get_users()
 
-        fFam = [self.parent().font().styleName()]
-        for f in qGui.QFontDatabase().families():
-            fFam.append(f)
-        #fFam = qGui.QFontDatabase.families()
-        #fFam = fontDb.families()
+            userLabel = qt.QLabel("Users: ")
+            self.grid.addWidget(userLabel,2,1)
 
-        #print(f"f-fam: {fFam}")
-        self.font_list.addItems(fFam)
-        #font_list.currentIndexChanged.connect(lambda checked=False,e=)
-        submit = qt.QPushButton("Submit")
-        submit.clicked.connect(self.changeFontUsingCurrent)
-        self.grid.addWidget(submit)
+            scroll = qt.QScrollArea(self)
+            scroll.setWidgetResizable(True)
+            scroll.setFixedHeight(self.height()//4)
+            self.grid.addWidget(scroll,2,2)
 
-        self.font_size = qt.QLineEdit()
-        self.font_size.setText("14")
-        self.grid.addWidget(self.font_size,1,2)
+            b_con = qt.QFrame()
+            self.b_lay = qt.QVBoxLayout(b_con)
+
+            for user in users:
+                b = qt.QLabel(user)
+                self.b_lay.addWidget(b)
+            scroll.setWidget(b_con)
+
+
+            addUser = qt.QPushButton("Add User")
+            addUser.clicked.connect(self.newUser)
+            self.grid.addWidget(addUser,3,2)
+
+
+        groupPage = qt.QWidget()
+        groupPage.setLayout(self.grid)
+        self.layout.addWidget(groupPage)
+
+
+
+    def newUser(self):
+        print("NEW USER!!")
+        newName = qt.QLineEdit(self)
+        newName.setPlaceholderText("Name...")
+        newName.returnPressed.connect(lambda checked=False,e=newName: self.addUser(e))
+        #newName.setVisible(True)
+        #newName.resize(200,200)
+        #newName.setFixedSize(100,80)
+        #self.grid.addWidget(newName)
+        self.b_lay.addWidget(newName)
+
+    def addUser(self,widget):
+        found = False
+        for i in range(self.b_lay.count()):
+            if self.b_lay.itemAt(i).widget()==widget:
+                name = widget.text()
+                if name not in self.kern.get_users():
+                    newUser = qt.QLabel(name)
+                    self.kern.add_user(name.strip(),'123')
+                    self.b_lay.addWidget(newUser)
+                    widget.deleteLater()
+                    found = True
+
+                else:
+                    widget.setPlaceholderText("Must be new name...")
+                    widget.setStyleSheet("border: 2px solid red")
+                    widget.setText("")
+                    found = True
+        if not found:
+            print("Error. Widget for adding user not found.")
+
+    def fontChange(self):
+        print("Font change!")
 
         
+        self.getDash()
+
+        if self.kern.get_current_user()!=self.kern.get_file_system().get_root():
+            #self.getDash()
+            self.font_list = qt.QComboBox()
+
+            self.grid.addWidget(self.font_list,1,2)
+
+            fFam = [self.parent().font().styleName()]
+
+            for f in qGui.QFontDatabase().families():
+                fFam.append(f)
+
+            #fFam = qGui.QFontDatabase.families()
+            #fFam = fontDb.families()
+
+            #print(f"f-fam: {fFam}")
+            self.font_list.addItems(fFam)
+            font_label = qt.QLabel("Fonts: ")
+            self.grid.addWidget(font_label,1,1)
+            #font_list.currentIndexChanged.connect(lambda checked=False,e=)
+            submit = qt.QPushButton("Submit")
+            submit.clicked.connect(self.changeFontUsingCurrent)
+            self.grid.addWidget(submit,2,1,1,4)
+
+            # Font size
+            size_label = qt.QLabel("Font Size: ")
+            self.grid.addWidget(size_label,1,3)
+            self.font_size = qt.QLineEdit()
+            self.font_size.setText("14")
+            self.grid.addWidget(self.font_size,1,4)
+
         fontPage = qt.QWidget()
         fontPage.setLayout(self.grid)
         self.layout.addWidget(fontPage)

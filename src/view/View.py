@@ -258,7 +258,7 @@ class MainWindow(qt.QWidget):
 
         # Files App
         files_button = qt.QPushButton()
-        files_button.clicked.connect(lambda: print("FILES"))
+        files_button.clicked.connect(lambda checked=False,e="fileManager":self.runApp(e))
         files_button.setIconSize(qCore.QSize(size,size))
         files_button.setIcon(qGui.QIcon("view/assets/Files.png"))
         self.dock_layout.addWidget(files_button)

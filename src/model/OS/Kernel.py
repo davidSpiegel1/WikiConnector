@@ -58,6 +58,9 @@ class FileSystem:
         self.current_directory = self.root
         self.parent_directory = None
 
+    def get_current_directory(self):
+        return self.current_directory
+
     # Need to create a file as well 
     def create_file(self,name,content):
         self.current_directory.file[name] = self.FileNode(name,content)

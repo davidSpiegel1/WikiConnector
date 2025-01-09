@@ -2,8 +2,8 @@
 import csv
 import sys
 # Define token types
-NUMBER, select, where, AND, OR, column, RPAREN, EOF, equal, lessThan, greaterThan,LS,CD,RM,CAT,MKDIR,RUN,USERADD,PASSWD,SU,USERMOD = (
-    'NUMBER', 'select', 'where', 'AND', 'OR', 'column', 'RPAREN', 'EOF','=','LESS','GREAT','ls','cd','rm','cat','mkdir','run','useradd','passwd','su','usermod'
+NUMBER, select, where, AND, OR, column, RPAREN, EOF, equal, lessThan, greaterThan,LS,CD,RM,CAT,MKDIR,RUN,USERADD,PASSWD,SU,USERMOD,PWD = (
+    'NUMBER', 'select', 'where', 'AND', 'OR', 'column', 'RPAREN', 'EOF','=','LESS','GREAT','ls','cd','rm','cat','mkdir','run','useradd','passwd','su','usermod','pwd'
 )
 
 import subprocess
@@ -126,6 +126,9 @@ class Scanner:
                 elif self.pos+len(USERMOD) < len(self.text)+1 and self.text[self.pos:self.pos+len(USERMOD)]==USERMOD:
                     self.advance(USERMOD)
                     return Token(USERMOD,USERMOD)
+                elif self.pos+len(PWD) < len(self.text)+1 and self.text[self.pos:self.pos+len(PWD)]==PWD:
+                    self.advance(PWD)
+                    return Token(PWD,PWD)
                 else:
                     return self.column()
 
@@ -148,7 +151,7 @@ class Parser:
             self.error()
     def bash (self):
         token = self.current_token
-        if token.t in {CD,LS,RM,CAT,MKDIR,RUN,USERADD,PASSWD,SU,USERMOD}:
+        if token.t in {CD,LS,RM,CAT,MKDIR,RUN,USERADD,PASSWD,SU,USERMOD,PWD}:
             n = {'type': token.t,'right': None}
             self.eat(token.t)
             n1 = self.term()
@@ -209,7 +212,7 @@ class Parser:
 
         if self.current_token.t == select:
             return self.select()
-        elif self.current_token.t in (LS,MKDIR,CD,CAT,RM,RUN,USERADD,PASSWD,SU,USERMOD):
+        elif self.current_token.t in (LS,MKDIR,CD,CAT,RM,RUN,USERADD,PASSWD,SU,USERMOD,PWD):
             return self.bash()
         
 class Interpreter:
@@ -228,7 +231,7 @@ class Interpreter:
             self.visit_Expr(ast['where'])
         if ast is not None and ast['type'] == column:
             self.variables['column'] = ast['val']
-        if ast is not None and ast['type'] in (LS,MKDIR,CD,CAT,RM,RUN,USERADD,PASSWD,SU,USERMOD):
+        if ast is not None and ast['type'] in (LS,MKDIR,CD,CAT,RM,RUN,USERADD,PASSWD,SU,USERMOD,PWD):
             self.variables['bash'] = ast['type']
             #self.variables['args'] = ast['right']
         return self.variables
@@ -325,6 +328,9 @@ class Query:
             if commands['bash']=='passwd' and 'column' in commands:
                 print("Preforming passwd")
                 kernel.trigger_password_reset(commands['column'].strip())
+            if commands['bash']=='pwd':
+                print("Preforming pwd")
+                self.fList.append(kernel.get_file_system().get_current_directory().name)
 
             if commands['bash']=='run' and 'column' in commands:
                 print("Preforming run")
