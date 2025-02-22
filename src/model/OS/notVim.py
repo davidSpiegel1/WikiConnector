@@ -28,7 +28,7 @@ class notVim:
         while True:
             command = input("vim> ").strip()
             if command.startswith("open "):
-                filename = command.split(" ")[1]
+                filename = "".join(command.split(" ")[1:])
                 self.open(filename)
             elif command.startswith("write "):
                 content = command.split(" ",1)[1]

@@ -1,8 +1,9 @@
 * We have the app connected to the dashboard.
 * Front page to have random wiki facts.
 ******
-* Must have bluetooth (Give packets of data between two computers - Share ability)
-* Must have 'Connectors' finally there.
+* Must have bluetooth (Give packets of data between two computers - Share ability) 
+	* Started looking into this - (02/21/25)
+* Must have 'Connectors' finally there. [DONE]
 
 * Some Notes on Operating Systems:
 
@@ -79,6 +80,9 @@
 		* User applications run in USER-SPACE
 		* Remember: Interrupts literly interupt the processer.
 
+* Finished migration to PyQt5. Also, added an 'App' layer to the program.
+
+* Added the first connector. - (02/21/25)
 
 
 

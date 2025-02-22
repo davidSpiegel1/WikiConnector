@@ -12,6 +12,7 @@ from model.OS.dbEngine import *
 from model.OS.notVim import *
 from model.OS.programTest import *
 from model.terminal import *
+from model.Module import *
 from view.View import *
 import tkinter as tk
 import getpass
@@ -112,6 +113,12 @@ class FileSystem:
         self.home = self.DirectoryNode("home")
         self.root.subdirectories["home"]= self.home
         self.makeEtcDir(self.root)
+        
+        # So root can use connectors
+        mod = self.DirectoryNode("Modules")
+        con = self.DirectoryNode("Connectors")
+        mod.subdirectories["Connectors"] = con
+        self.root.subdirectories["Modules"] = mod
 
     def makeEtcDir(self, root):
         # Must make the needed .config things soon!
@@ -128,8 +135,12 @@ class FileSystem:
             self.home.subdirectories[username].subdirectories["Documents"] = self.DirectoryNode("Documents")
             self.home.subdirectories[username].subdirectories["Downloads"] = self.DirectoryNode("Downloads")
             self.home.subdirectories[username].subdirectories["Modules"] = self.DirectoryNode("Modules")
+
             # Making needed config data
             self.createConfig(self.home.subdirectories[username].subdirectories["Modules"],username)
+            # Making directory for connectors 
+            self.home.subdirectories[username].subdirectories["Modules"].subdirectories["Connectors"] = self.DirectoryNode("Connectors")
+            self.home.subdirectories[username].subdirectories["Modules"].subdirectories["Connectors"].subdirectories["Data"] = self.DirectoryNode("Data")
 
             self.save_file_system()
 
@@ -203,12 +214,15 @@ class Kernel:
     def __init__(self):
         self.file_system = FileSystem()
         self.apps = {}
+        self.libs = None
         self.users = {"root":"root"}
         #self.load_users()
         self.current_user = None
         self.prog_file = "prog_registry.pkl"
         self.users_file = "user_registry.pkl"
         self.load_users()
+
+
         
     def get_file_system(self):
         return self.file_system
@@ -356,8 +370,16 @@ class Kernel:
                     return app_instance.run()
                 else:
                     raise AttributeError(f"Application '{name}' not found")
+            else:
+                print("Not callable: ",app_class)
         else:
             raise ValueError(f"Application '{name}' not found.")
+    def run_query(self,connector,query):
+        if connector in self.apps:
+            print("Connector in apps!")
+        #else:
+
+
     def save_prog(self):
         with open(self.prog_file,"wb") as file:
             pickle.dump(self.apps,file)
@@ -372,9 +394,18 @@ class Kernel:
     def get_apps_name(self):
         names = []
         for name in self.apps:
-            names.append(name)
+            print(self.apps[name])
+            if name in self.libs:
+                if issubclass(self.libs[name],App):
+                    names.append(name)
+                    
+                else:
+                    print("Name a lib but not instance",name)
+                    print("Instance: ",self.libs[name])
+            #names.append(name)
         return names
-    #def get_app(self,
+    def get_apps(self):
+        return self.apps
 
     def register_lib_apps(self):
         if os.path.exists(self.prog_file):
@@ -398,6 +429,7 @@ class Kernel:
                 print("Error registering programTest",e)
 
     def register_lib_app(self,libs):
+        self.libs = libs
         if os.path.exists(self.prog_file):
             self.load_prog()
         else:
@@ -406,24 +438,6 @@ class Kernel:
                     self.register_application(name,libs[name])
                 except Exception as e:
                     print(f"Error registering '{name}' app")
-
-
-class MyApp:
-    def __init__(self):
-        self.message = "HI"
-    def run (self):
-        print(f"MyApp says: {self.message}")
-
-class TkProg:
-    def __init__(self):
-        window = tk.Tk()
-        window.title("HI")
-        label = tk.Label(window,text="HI")
-        label.pack()
-        window.mainloop()
-    def run(self):
-        print("HI")
-
 
 """def main():
     k = Kernel()

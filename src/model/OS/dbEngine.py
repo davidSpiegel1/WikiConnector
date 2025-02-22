@@ -339,6 +339,8 @@ class Query:
                         kernel.run_application(commands['column'].strip(),file_system=kernel.get_file_system())
                     if commands['column'].strip() in ('view','View'):
                         kernel.run_application(commands['column'].strip(),kern=kernel)
+                    elif commands['column'].strip() in kernel.get_apps_name():
+                        self.fList.append(kernel.run_application(commands['column'].strip(),commands['column'].strip(),kernel))
                     else:
                         kernel.run_application(commands['column'].strip())
                     
@@ -423,7 +425,7 @@ class dbEngine:
         self.q.query(result,self.kernel)
 
     def getFlist(self):
-        return self.q.getFlist() if self.q is not None else None
+        return self.q.getFlist() if self.q is not None else [""]
         #while True:
         #self.token = scanner.get_next_token()
         #self.tokens.append(self.token)

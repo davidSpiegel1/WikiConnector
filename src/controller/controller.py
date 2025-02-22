@@ -5,8 +5,10 @@ import subprocess
 import csv
 #from model import webViewBrowser
 #from model import GoogleSource
-from model import terminal
+#from model import terminal
+from model.terminal import *
 from model import settings
+from model.wiki import *
 #import tkinter as tk
 import threading
 
@@ -27,9 +29,74 @@ class Controller:
         if appName=="programTest":
             return self.kern.run_application(appName)
         elif appName=="terminal":
+            try:
+                return self.kern.run_application(appName,appName,self.kern)
+            except CustomError as e:
+                print("ERROR:",e)
+        elif appName in self.kern.get_apps_name():#("settings","fileManager","wiki"):
             return self.kern.run_application(appName,appName,self.kern)
-        elif appName in ("settings","fileManager"):
-            return self.kern.run_application(appName,appName,self.kern)
+        elif "Q:(" in appName:
+            print("CONNECTOR: ",appName)
+            queryValidate = appName.split("Q:(")
+            if len(queryValidate) <= 2:
+                print("Right!",queryValidate)
+                conValidate = queryValidate[1].split(")->")
+                if len(conValidate) <= 2:
+                    print("Right again!",conValidate)
+                    curQuery = conValidate[0].strip()
+                    curCon = conValidate[1].strip()
+                    #return self.kern.run_query(curCon,curQuery)
+                    return self.build_connector(curCon,curQuery)
+                    print("Current query: ",curQuery)
+                    print("Current connection: ",curCon)
+
+                else:
+                    print("Error. Too many )->",conValidate)
+            else:
+                print("Error. Too many Q:(s",queryValidate,len(queryValidate))
+            #conName = appName.split("->")[1].strip()
+            #q1 = appName.split("Q:(")[1].split(")->")[0].strip()
+            #[1].split(")")
+            #print("THE q1: ",q1)
+            #if len(q1)<2:
+            #fq = q1[0]
+            #print("Final Query: ",fq)
+            #if len(q1) >0:
+            #    return self.kern.run_query(conName,q1)
+    def build_connector(self,connector,query):
+        connector = connector.strip()
+        if connector in self.kern.get_apps():
+            print("THE CONNECTOR: ",connector)
+            
+            q = self.kern.run_application(connector,connector,self.kern)
+            q.setQuery(query)
+            q.runQuery()
+            return q
+        else:
+            self.register_connector(connector)
+            q = self.kern.run_application(connector,connector,self.kern)
+            q.setQuery(query)
+            q.runQuery()
+            return q
+
+    def register_connector(self,connector):
+        t = self.getType(connector)
+        if t == 'wiki':
+            #lib = {connector:wiki}
+            self.kern.register_application(connector,wiki)
+        else:
+            print("Register did not work",t)
+
+
+    def getType(self,connector):
+        return self.getConnectorData(connector).split(";")[1].split(":")[1].strip()
+
+    def getConnectorData(self,connector):
+        self.kern.get_file_system().switch_to_user_home(self.kern.get_current_user())
+        self.kern.get_file_system().change_directory("Modules")
+        self.kern.get_file_system().change_directory("Connectors")
+        return self.kern.get_file_system().open_file(connector)
+
 
     def setConnector(self,connector):
         self.currentConnect = connector
@@ -64,10 +131,6 @@ class Controller:
             os.system("python3 model/WorldBankSource.py "+text+"; mv test.csv "+view)
         elif self.currentConnect == 'AppleMusic':
             os.system("python3 model/AppleMusic.py "+text+"; mv test.csv "+view)
-        #os.chdir("../")
-        #os.chdir('../')
-        #os.chdir("view")
-        #print("The dir",os.listdir())
     """def queryBrowser(self,query,parent_frame):
         #wb = webViewBrowser.WebViewBrowser("google.com")
         

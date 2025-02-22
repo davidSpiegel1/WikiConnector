@@ -19,3 +19,4 @@ Clone the most recent version. Run the ``Main.py`` file within the ``src`` direc
 * added a query editor to the application
 * Made the readme
 * Changed to PyQt5 gui lib. Also added bash-like features to query language.
+* Added an 'App' layer that has applications like terminal and settings. Also, have started on building connector layer.

@@ -90,8 +90,23 @@ class fileManager(App):
 
         if goBack:
             self.clearCurView()
+        
         home = qt.QLabel(dirName)
+        back = qt.QPushButton("<")
+        back.setFixedSize(30,30)
+        back.clicked.connect(lambda checked=False,e="..": self.buildCurView(e,goBack=True))
+
+        top_pane = qt.QFrame()
+        top_layout = qt.QHBoxLayout(top_pane)
+        top_layout.addWidget(back)
+        top_layout.addWidget(home)
+
+        #top_pane
+
+
         self.curList = qt.QVBoxLayout()
+
+
 
         scroll_area = qt.QScrollArea(self)
         scroll_area.setWidgetResizable(True)
@@ -106,9 +121,6 @@ class fileManager(App):
         except Exception as e:
             raise ValueError("Error. No Dir in fileManager.py")
         curNodes = self.kern.get_file_system().list_contents()#["F1","F2","F3","F4","F5","F6","F7"]
-
-        #scroll_area.setFixedHeight(self.height()//2)
-
 
         #for name in curNodes:
         #    b = qt.QPushButton(name)
@@ -127,7 +139,8 @@ class fileManager(App):
         scroll_area.setWidget(button_container)
 
 
-        self.curList.addWidget(home)
+        #self.curList.addWidget(home)
+        self.curList.addWidget(top_pane)
         self.curList.addWidget(scroll_area)
         
         #self.overList.addWidget(self.overList)

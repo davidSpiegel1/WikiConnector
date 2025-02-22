@@ -3,6 +3,7 @@ import subprocess
 import sys
 import traceback
 from controller import controller
+from model.Module import *
 import io
 try:
     import screeninfo
@@ -46,6 +47,8 @@ class MainWindow(qt.QWidget):
         self.unlocked = False
         self.searchBar = None
         
+        self.connectors = None
+
         self.usersScreen()
 
     def usersScreen(self):
@@ -152,6 +155,7 @@ class MainWindow(qt.QWidget):
                     (self.width() - self.searchBar.width()) // 2,  # Center horizontally
                     (self.height() - self.searchBar.height()) // 2  # Center vertically
         )
+        self.searchBar.keyPressEvent = self.keyPressEventSearch
 
         self.suggestions_list = qt.QListWidget(self)
         self.suggestions_list.setVisible(False)
@@ -175,6 +179,10 @@ class MainWindow(qt.QWidget):
         #self.layout.addWidget(self.searchBar,alignment=qCore.Qt.AlignmentFlag.AlignCenter)
         #self.layout.addWidget(self.searchBar)
         self.buildDock()
+        
+        # The connectors 
+        self.connectors = self.loadConnectors()
+        print("The connectors: ",self.connectors)
 
         self.setLayout(self.layout)
        
@@ -239,6 +247,21 @@ class MainWindow(qt.QWidget):
                 print(f"Error loading style for '{username}'") 
                 print(traceback.format_exc())
 
+
+    def loadConnectors(self):
+        self.kern.get_file_system().switch_to_user_home(self.kern.get_current_user())
+        self.kern.get_file_system().change_directory("Modules")
+        self.kern.get_file_system().change_directory("Connectors")
+        files = self.kern.get_file_system().list_contents()["files"]
+        Connectors = []
+        for file in files:
+            Connectors.append(file)
+        # Go back to root dir
+        self.kern.get_file_system().switch_to_user_home(self.kern.get_current_user())
+        return Connectors
+
+
+
     def buildDock(self):
         # Make the window transparent to mouse events at the bottom
         #self.setMask(qGui.QRegion(0, 0, self.width(), self.height() - 50))
@@ -262,9 +285,9 @@ class MainWindow(qt.QWidget):
         files_button.setIconSize(qCore.QSize(size,size))
         files_button.setIcon(qGui.QIcon("view/assets/Files.png"))
         self.dock_layout.addWidget(files_button)
-
         # Connectors App
         connector_button = qt.QPushButton()
+        connector_button.clicked.connect(lambda checked=False,e="connectors":self.runApp(e))
         connector_button.setIconSize(qCore.QSize(size,size))
         connector_button.setIcon(qGui.QIcon("view/assets/Connector.png"))
         self.dock_layout.addWidget(connector_button)
@@ -289,13 +312,11 @@ class MainWindow(qt.QWidget):
 
     def mouseMoveEvent(self,event):
     #def eventFilter(self,source,event):
-        print("EVENT FILTER")
+        #print("EVENT FILTER")
         if event.type() == qCore.QEvent.Type.MouseMove:
         #if event.type() == qCore.QEvent.Type.HoverMove:
         #if True:
             mouse_y = event.pos().y()
-            print("Mouse y: ",mouse_y)
-            print(f"This: {self.height()-(self.height()//25)} needs to be less than: {mouse_y} that needs to be less than: {self.height()}")
             if self.height()-(self.height()//9) <= mouse_y <= self.height():
                 self.dock_frame.setVisible(True)
                 self.dock_frame.raise_()
@@ -356,7 +377,10 @@ class MainWindow(qt.QWidget):
             self.suggestions_list.setVisible(False)
             self.mainTab.raise_()
             self.mainTab.setFocus()
-            self.add_new_tab2(widget,self.searchBar.text())
+            if isinstance(widget,Module):
+                self.add_new_tab2(widget,widget.getName())
+            else:
+                self.add_new_tab2(widget,self.searchBar.text())
 
         else:
             widget = self.Controller.runApp(appName)
@@ -401,6 +425,8 @@ class MainWindow(qt.QWidget):
         self.plus_tab_index += 1
         self.mainTab.setCurrentIndex(indexVal)
 
+
+
     def close_tab(self,index):
         if index != self.plus_tab_index:
             self.mainTab.removeTab(index)
@@ -413,7 +439,6 @@ class MainWindow(qt.QWidget):
         #    self.add_new_tab()
     
     def keyPressEvent(self,event):
-        print("Key Event")
         if self.unlocked and event.key() == qCore.Qt.Key.Key_Q and event.modifiers() in (qCore.Qt.KeyboardModifier.ControlModifier,qCore.Qt.KeyboardModifier.AltModifier):
             if not self.searchBar.isVisible():
                 self.searchBar.setVisible(True)
@@ -432,6 +457,24 @@ class MainWindow(qt.QWidget):
         else:
             super().keyPressEvent(event)
 
+    def keyPressEventSearch(self,event):
+        curRow = self.suggestions_list.currentRow()
+        if event.key() == qCore.Qt.Key_Down:
+            if curRow < self.suggestions_list.count()-1:
+                self.suggestions_list.setCurrentRow(curRow+1)
+        elif event.key() == qCore.Qt.Key_Up:
+            if curRow > 0:
+                self.suggestions_list.setCurrentRow(curRow-1)
+        elif (event.key() == qCore.Qt.Key_Return or event.key() == qCore.Qt.Key_Enter):
+            current_item = self.suggestions_list.currentItem()
+            if current_item is not None and len(current_item.text()) > 1:
+                self.searchBar.setText(current_item.text())
+            else:
+                self.runApp(self.searchBar.text(),searched=True)
+
+        else:
+            qt.QLineEdit.keyPressEvent(self.searchBar,event)
+
     def mousePressEvent(self,event):
         #if event.button() == qCore.Qt.LeftButton:
         if self.searchBar is not None:
@@ -446,8 +489,16 @@ class MainWindow(qt.QWidget):
 
     def update_suggestions(self,text):
         x = self.Controller.getCurApps()
+        # The connectors 
+        self.connectors = self.loadConnectors()
         if text:
             filtered_suggestions = [s for s in x if text.lower() in s.lower()]
+            if len(self.connectors) > 0:
+
+                for i in self.connectors:
+                    t = self.getUsed(i)
+                    if t=="True":
+                        filtered_suggestions.append(f"Q:({text})-> {i}")
             self.suggestions_list.clear()
             for suggestion in filtered_suggestions:
                 qt.QListWidgetItem(suggestion,self.suggestions_list)
@@ -459,6 +510,12 @@ class MainWindow(qt.QWidget):
 
         else:
             self.suggestions_list.setVisible(False)
+
+    def getUsed(self,file):
+        print("For file: ",file)
+        x = self.Controller.getConnectorData(file)
+        #print(x)
+        return x.split(";")[3].split(":")[1].strip()
             
     def shake(self):
         print("AT SHAKE")

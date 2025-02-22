@@ -11,12 +11,19 @@ except ImportError:
     print("PyQt5 not found. Using pip to install")
     subprocess.check_call([sys,executable,"-m","pip","install","PyQt5"])
 
+
+class CustomError(Exception):
+    def __init__(self,progName,prog):
+        super().__init__(progName)
+        self.prog = prog
 class terminal(App):
     def __init__(self,name,kern):
         #print("TEST P")
         super().__init__(name,kern)
         print("Terminal App")
         self.kern = kern
+        self.kern.get_file_system().switch_to_user_home(self.kern.get_current_user())
+        self.view = None
         self.dbEng = dbEngine(self.kern)
         curStyle = "background-color: #3b4252; color: #eceff4;"
 
@@ -63,8 +70,13 @@ class terminal(App):
             self.dbEng.scan(command)
             self.dbEng.parse()
             t = t+"\n"+str(self.dbEng.getFlist())
+            if len(self.dbEng.getFlist()) > 0:
+                if isinstance(self.dbEng.getFlist()[0],Module):
+                    print("IS A PROGRAM!!!")
+                    raise CustomError("fileManager",self.dbEng.getFlist()[0])
+                    #return
         except Exception as e:
-            t = t+"\n"+"Error."+str(e)
+            t = t+"\n"+"Error. "+str(e)
         t = t+"\n"
         vert = self.scroll_area.verticalScrollBar()
         vert.setValue(vert.maximum())
