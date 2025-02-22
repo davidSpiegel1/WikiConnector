@@ -34,7 +34,7 @@ class Install:
 
     def installPIL(self):
         if self.distro=="arch":
-            subprocess.check_call(["sudo","pacman","-S","--noconfirm","python-pil"])
+            subprocess.check_call(["sudo","pacman","-S","--noconfirm","python-pillow"])
             print("PIL installed on arch")
         elif self.os_name=="Darwin":
             subprocess.check_call([sys,executable,"-m","pip","install","PIL"])
@@ -43,10 +43,17 @@ class Install:
     def installScreenInfo(self):
         if self.distro=="arch":
             # import screeninfo
-            subprocess.check_call(["sudo","pacman","-S","noconfirm","python-screeninfo"])
+            subprocess.check_call(["sudo","pacman","-S","--noconfirm","python-screeninfo"])
             print("screninfo installed on arch")
         elif self.os_name == "Darwin":
             subprocess.check_call([sys,executable,"-m","pip","install","screeninfo"])
+
+    def installTkinter(self):
+        if self.distro=="arch":
+            subprocess.check_call(["sudo","pacman","-S","tk"])
+            print("tk installed on arch")
+        elif self.os_name == "Darwin":
+            subprocess.check_call([sys,executable,"-m","pip","install","tk"])
             
 
     def get_distro(self):

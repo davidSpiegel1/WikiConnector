@@ -20,12 +20,16 @@ try:
 except ImportError:
     print("Error importing PIL")
     install.installPIL()
-
-try:
+"""try:
     import screeninfo
 except ImportError:
     print("Error importing screeninfo")
-    install.installScreenInfo()
+    install.installScreenInfo()"""
+"""try:
+    import tkinter as tk
+except ImportError:
+    print("Error importing tk")
+    install.installTkinter()"""
 
 
 

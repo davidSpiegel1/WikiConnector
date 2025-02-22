@@ -5,12 +5,13 @@ import traceback
 from controller import controller
 from model.Module import *
 import io
-try:
+import tkinter as tk
+"""try:
     import screeninfo
 except ImportError:
     print("screeninfo not found. Using pip to install")
     subprocess.check_call([sys.executable,"-m","pip","install","screeninfo"])
-    import screeninfo
+    import screeninfo"""
 
 try:
     #from PyQt5.QtWidgets import QApplication, QMainWindow, QPushButton
@@ -30,15 +31,16 @@ except ImportError:
     subprocess.check_call([sys,executable,"-m","pip","install","PIL"])
 
 class MainWindow(qt.QWidget):
-    def __init__(self,kern):
+    def __init__(self,kern,app):
         
         super().__init__()
         self.kern = kern
         self.Controller = controller.Controller(self.kern)
         self.setWindowTitle("Wiki OS")
-        screen = screeninfo.get_monitors()[0]
-        height = (int)(screen.height*0.70)
-        width = (int)(screen.width*0.60)
+        #screen = screeninfo.get_monitors()[0]
+        screen = app.primaryScreen().size()
+        height = (int)(screen.height()*0.70)
+        width = (int)(screen.width()*0.60)
         self.setFixedSize(width,height)  # (x, y, width, height)
         self.dock_frame = None
 
@@ -465,7 +467,7 @@ class MainWindow(qt.QWidget):
         elif event.key() == qCore.Qt.Key_Up:
             if curRow > 0:
                 self.suggestions_list.setCurrentRow(curRow-1)
-        elif (event.key() == qCore.Qt.Key_Return or event.key() == qCore.Qt.Key_Enter):
+        elif (event.key() in (qCore.Qt.Key_Return,qCore.Qt.Key_Enter)):
             current_item = self.suggestions_list.currentItem()
             if current_item is not None and len(current_item.text()) > 1:
                 self.searchBar.setText(current_item.text())
@@ -556,7 +558,7 @@ class View:
         except Exception as e:
             print("Error: Touble opening style file")
         try:
-            window = MainWindow(self.kern)         # Create the main window
+            window = MainWindow(self.kern,app)         # Create the main window
             window.show()                 # Show the window
             sys.exit(app.exec())          # Execute the application loop
         except Exception as e:
