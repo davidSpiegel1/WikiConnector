@@ -2,8 +2,8 @@ QWidget {
     background-color: #5e81ac;
     color: #e5e9f0;
     font-weight: bold;
-    font-family: Arial;
-    font-size: 14px;
+    font-family: Arial;/*DREAM FONT: PT Sans Caption;*/
+    font-size: 17px;
 }
 QTabWidget::tab-bar {
                 alignment: left; /* Align the tabs at the center */

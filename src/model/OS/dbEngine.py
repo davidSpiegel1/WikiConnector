@@ -266,11 +266,12 @@ class Interpreter:
                 self.variables[right['val']+'>'] = left['val']
 
 class Query:
-    def __init__(self,commands):
+    def __init__(self,parent):
         #self.com = commands
         #self.fList = []
         
         self.current_dir = ''
+        self.parent = parent
         
     def query(self,commands,kernel):
         self.com = commands
@@ -339,6 +340,8 @@ class Query:
                         kernel.run_application(commands['column'].strip(),file_system=kernel.get_file_system())
                     if commands['column'].strip() in ('view','View'):
                         kernel.run_application(commands['column'].strip(),kern=kernel)
+                    elif commands['column'].strip().lower() in ('terminal','power'):
+                        self.fList.append(kernel.run_application(commands['column'].strip(),commands['column'].strip(),None,kernel))
                     elif commands['column'].strip() in kernel.get_apps_name():
                         self.fList.append(kernel.run_application(commands['column'].strip(),commands['column'].strip(),kernel))
                     else:

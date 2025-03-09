@@ -17,11 +17,12 @@ class CustomError(Exception):
         super().__init__(progName)
         self.prog = prog
 class terminal(App):
-    def __init__(self,name,kern):
+    def __init__(self,name,parent,kern):
         #print("TEST P")
         super().__init__(name,kern)
         print("Terminal App")
         self.kern = kern
+        self.parent = parent
         self.kern.get_file_system().switch_to_user_home(self.kern.get_current_user())
         self.view = None
         self.dbEng = dbEngine(self.kern)
@@ -73,7 +74,11 @@ class terminal(App):
             if len(self.dbEng.getFlist()) > 0:
                 if isinstance(self.dbEng.getFlist()[0],Module):
                     print("IS A PROGRAM!!!")
-                    raise CustomError("fileManager",self.dbEng.getFlist()[0])
+                    #raise CustomError("fileManager",self.dbEng.getFlist()[0])
+                    # Trying to run application
+                    self.parent.runApp(self.dbEng.getFlist()[0].getName())
+
+
                     #return
         except Exception as e:
             t = t+"\n"+"Error. "+str(e)

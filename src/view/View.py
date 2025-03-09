@@ -35,7 +35,7 @@ class MainWindow(qt.QWidget):
         
         super().__init__()
         self.kern = kern
-        self.Controller = controller.Controller(self.kern)
+        self.Controller = controller.Controller(self.kern,self)
         self.setWindowTitle("Wiki OS")
         #screen = screeninfo.get_monitors()[0]
         screen = app.primaryScreen().size()
@@ -52,7 +52,8 @@ class MainWindow(qt.QWidget):
         self.connectors = None
 
         self.usersScreen()
-
+    def sayHello(self):
+        print("HI!")
     def usersScreen(self):
 
         self.clearLayout(self.layout)
@@ -67,19 +68,36 @@ class MainWindow(qt.QWidget):
         self.setLayout(self.layout)
 
     def loginScreen(self,username):
-
+        
+        if self.unlocked:
+            self.unlocked = False
+        size = self.height()//4
         self.clearLayout(self.layout)
         self.username = qt.QLabel(str(username))
-
+        self.username.setStyleSheet(f"color: white; font-size: {size//6}px;")
+        self.username.setAlignment(qCore.Qt.AlignCenter)
+        
+        # User icon 
+        userIcon = qt.QPushButton()
+        userIcon.setIconSize(qCore.QSize(size,size))
+        pixMap = qGui.QPixmap("view/assets/User.png")
+        mask = pixMap.createMaskFromColor(qCore.Qt.transparent,qCore.Qt.MaskInColor)
+        coloredP = qGui.QPixmap(pixMap.size())
+        coloredP.fill(qGui.QColor("white"))
+        coloredP.setMask(mask)
+        userIcon.setIcon(qGui.QIcon(coloredP))
+        #userIcon.setIcon(qGui.QIcon("view/assets/User.png"))
+        userIcon.setStyleSheet("background-color: #5e81ac; opacity: 1.0; border: none; color: white;")
+        
         # Back button to choose different account
         backBut = qt.QPushButton("<")
         backBut.setFixedSize(30,30)
         backBut.clicked.connect(self.usersScreen)
 
-        #button = qt.QPushButton(">")
-        #button.setFixedSize(30,30)
-        #button.setObjectName("circularButton")
-        #button.clicked.connect(self.validateLogin)
+        enterBut = qt.QPushButton(">")
+        enterBut.setFixedSize(30,30)
+        enterBut.clicked.connect(self.validateLogin)
+        
         self.password  = qt.QLineEdit()
         self.password.setEchoMode(qt.QLineEdit.EchoMode.Password)
         self.password.setPlaceholderText("Password")
@@ -89,8 +107,9 @@ class MainWindow(qt.QWidget):
         # Password Layout
         pass_layout = qt.QHBoxLayout()
         pass_layout.addWidget(backBut)
+        #pass_layout.addWidget(userIcon)
         pass_layout.addWidget(self.password)
-        #pass_layout.addWidget(button)
+        pass_layout.addWidget(enterBut)
 
         password_widget = qt.QWidget()
         password_widget.setLayout(pass_layout)
@@ -99,6 +118,7 @@ class MainWindow(qt.QWidget):
         # Reboot options layout
 
         #Final Layout
+        self.layout.addWidget(userIcon)
         self.layout.addWidget(self.username)
         self.layout.addWidget(password_widget)
         #self.layout.addWidget(self.button,pass_layout)
@@ -126,6 +146,9 @@ class MainWindow(qt.QWidget):
             child = layout.takeAt(0)
             if child.widget():
                 child.widget().deleteLater()
+
+    def setUnlocked(self,value):
+        self.unlocked = value
 
     def homeScreen(self):
         
@@ -215,13 +238,15 @@ class MainWindow(qt.QWidget):
                 if fontName == "None":
                     fontName = "Arial"
                 if fontSize == "None":
-                    fontSize = "14"
+                    fontSize = "17"
 
                 if background != "None" and color == "None":
-                    self.setStyleSheet("QWidget{"+ f"color: {foreground}; background-color: {background}; font-family: {fontName}; font-size: {fontSize};"+"}"+
+                    self.setStyleSheet("QWidget{"+ f"color: {foreground}; background-color: {background}; font-family: {fontName}; font-size: {fontSize}px;"+"}"+
                         "QTabBar:tab{"+f"background: {background};border: 2px solid {foreground};"+"}"+
                         "QTabBar::tab:hover{"+f"background-color: {foreground}; color: {background};"+"}"+
                         "QPushButton:hover{"+f"background-color: {foreground}; color: {background};"+"}"+
+                                       "QToolButton{"+f"background-color: {background}; color: {foreground}; border: 4px solid {foreground}; border-radius: 15px;"+"}"+
+                                       "QToolButton:hover{"f"background-color: {foreground}; color: {background};"+"}"+
                         "QPushButton#close{background: transparent; border: none;}"+
                         "QPushButton#close:hover{color: #bf616a;}")
                     #self.searchBar.setStyleSheet(".QTabBar{"+f"background-color: {background}; color: {foreground};"+"}")
@@ -232,14 +257,18 @@ class MainWindow(qt.QWidget):
                     self.convert_to_srgb(path)
                     if background != "None":
                         self.setStyleSheet(".QWidget{"+f"border-image: url('{path}');"+"}"+
-                                           "QWidget{"+ f"color: {foreground}; background-color: {background}; font-family: {fontName}; font-size: {fontSize};"+"}"+
+                                           "QWidget{"+ f"color: {foreground}; background-color: {background}; font-family: {fontName}; font-size: {fontSize}px;"+"}"+
                         "QTabBar:tab{"+f"background: {background};border: 2px solid {foreground};"+"}"+
-                        "QTabBar::tab:hover{"+f"background-color: {foreground}; color: {background};"+"}"+
-                        "QPushButton:hover{"+f"background-color: {foreground}; color: {background};"+"}"+
+                                           "QTabBar::tab:hover{"+f"background-color: {foreground}; color: {background}; qproperty-icon: url(view/assets/Power.png);"+"}"+
+                        "QPushButton:hover{"+f"background-color: {foreground}; color: {background}; "+"}"+
+                                           "QToolButton{"+f"background-color: {background}; color: {foreground}; border: 4px solid {foreground}; border-radius: 20px;"+"}"+
+                                           "QToolButton{"+f"background-color: {foreground}; color: {background};"+"}"+
                         "QPushButton#close{background: transparent; border: none;}"+
                         "QPushButton#close:hover{color: #bf616a;}")
                     else:
-                        self.setStyleSheet(".QWidget{"+f"border-image: url('{path}');"+f"{self.stylesheet()}"+"}")
+                        self.setStyleSheet(".QWidget{"+f"border-image: url('{path}');"+f"{self.stylesheet()}; font-size: {fontSize}px;"+"}"+"QWidget{"+ f"color: {foreground}; background-color: {background}; font-family: {fontName}; font-size: {fontSize}px;"+"}")
+
+                        
                 #self.setStyleSheet("background-color: "+color+";")
 
                 #Switching back to user home
@@ -275,23 +304,45 @@ class MainWindow(qt.QWidget):
         # Settings App
         settings_button = qt.QPushButton()
         settings_button.clicked.connect(lambda checked=False,e="settings": self.runApp(e))
-        
-        size = self.height()//28
+        pixMap = qGui.QPixmap("view/assets/Settings.png")
+        mask = pixMap.createMaskFromColor(qCore.Qt.transparent,qCore.Qt.MaskInColor)
+        coloredP = qGui.QPixmap(pixMap.size())
+        coloredP.fill(qGui.QColor("white"))
+        coloredP.setMask(mask)
+        # Was 28
+        size = self.height()//24
         settings_button.setIconSize(qCore.QSize(size,size))
-        settings_button.setIcon(qGui.QIcon("view/assets/Settings.png"))
+        #settings_button.setIcon(qGui.QIcon("view/assets/Settings.png"))
+        settings_button.setIcon(qGui.QIcon(coloredP))
+        settings_button.setStyleSheet("QPushButton {background-color: #b48ead;} QPushButton:hover{background-color: #94628B;}")
         self.dock_layout.addWidget(settings_button)
 
         # Files App
         files_button = qt.QPushButton()
         files_button.clicked.connect(lambda checked=False,e="fileManager":self.runApp(e))
+        pixMap2 = qGui.QPixmap("view/assets/Files.png")
+        mask2 = pixMap2.createMaskFromColor(qCore.Qt.transparent,qCore.Qt.MaskInColor)
+        coloredP2 = qGui.QPixmap(pixMap.size())
+        coloredP2.fill(qGui.QColor("white"))
+        coloredP2.setMask(mask2)
         files_button.setIconSize(qCore.QSize(size,size))
-        files_button.setIcon(qGui.QIcon("view/assets/Files.png"))
+        #files_button.setIcon(qGui.QIcon("view/assets/Files.png"))
+        files_button.setIcon(qGui.QIcon(coloredP2))
+        files_button.setStyleSheet("QPushButton {background-color: #a3be8c;} QPushButton:hover{background-color: #87aa6a;}")
         self.dock_layout.addWidget(files_button)
+
         # Connectors App
         connector_button = qt.QPushButton()
         connector_button.clicked.connect(lambda checked=False,e="connectors":self.runApp(e))
+        pixMap3 = qGui.QPixmap("view/assets/Connector.png")
+        mask3 = pixMap3.createMaskFromColor(qCore.Qt.transparent,qCore.Qt.MaskInColor)
+        coloredP3 = qGui.QPixmap(pixMap3.size())
+        coloredP3.fill(qGui.QColor("white"))
+        coloredP3.setMask(mask3)
         connector_button.setIconSize(qCore.QSize(size,size))
-        connector_button.setIcon(qGui.QIcon("view/assets/Connector.png"))
+        #connector_button.setIcon(qGui.QIcon("view/assets/Connector.png"))
+        connector_button.setIcon(qGui.QIcon(coloredP3))
+        connector_button.setStyleSheet("QPushButton {background-color: #ebcb8b;} QPushButton:hover{background-color: #c9ab70;}")
         self.dock_layout.addWidget(connector_button)
 
         self.layout.addWidget(self.dock_frame)
@@ -315,7 +366,7 @@ class MainWindow(qt.QWidget):
     def mouseMoveEvent(self,event):
     #def eventFilter(self,source,event):
         #print("EVENT FILTER")
-        if event.type() == qCore.QEvent.Type.MouseMove:
+        if event.type() == qCore.QEvent.Type.MouseMove and self.unlocked:
         #if event.type() == qCore.QEvent.Type.HoverMove:
         #if True:
             mouse_y = event.pos().y()
@@ -479,7 +530,7 @@ class MainWindow(qt.QWidget):
 
     def mousePressEvent(self,event):
         #if event.button() == qCore.Qt.LeftButton:
-        if self.searchBar is not None:
+        if self.searchBar is not None and self.unlocked:
             self.searchBar.setVisible(False)
             self.suggestions_list.setVisible(False)
             self.mainTab.raise_()
@@ -545,6 +596,15 @@ class MainWindow(qt.QWidget):
                           format = 'JPEG',
                           quality = 50,
                           icc_profile = icc_conv)
+    def revertDefaultStyle(self):
+        try:
+            with open("view/assets/styles.qss","r") as file:
+                stylesheet = file.read()
+            self.setStyleSheet(stylesheet)
+        except Exception as e:
+            print("Error: Trouble opening style file")
+    def shutDown(self):
+        qt.QApplication.instance().quit()
 
 class View:
     def __init__(self,kern):

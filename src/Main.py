@@ -46,10 +46,11 @@ from model.fileManager import *
 from view.View import *
 from model.wiki import *
 from model.connectors import *
+from model.power import *
 
 k = Kernel()
 dbEng = dbEngine(k)
-lib_apps = {"notVim":notVim,"View":View,"programTest":programTest,"terminal":terminal,"settings":settings,"fileManager": fileManager,"wiki":wiki,"connectors":connectors}
+lib_apps = {"notVim":notVim,"View":View,"programTest":programTest,"terminal":terminal,"settings":settings,"fileManager": fileManager,"wiki":wiki,"connectors":connectors,"power":power}
 k.register_lib_app(lib_apps)
 #k.login(k.get_root(),"root")
 print(f"Login to a user: {k.get_users()}")

@@ -14,10 +14,11 @@ import threading
 
 
 class Controller:
-    def __init__(self,kern):
+    def __init__(self,kern,parent):
         self.kern = kern
         self.currentConnect = 'Wiki'
         self.possibleConnectors = {'Wiki','WorldBank','AppleMusic','WebViewBrowser'}
+        self.parent = parent
         self.google = None
         self.terminal = None
 
@@ -30,9 +31,11 @@ class Controller:
             return self.kern.run_application(appName)
         elif appName=="terminal":
             try:
-                return self.kern.run_application(appName,appName,self.kern)
+                return self.kern.run_application(appName,appName,self.parent,self.kern)
             except CustomError as e:
                 print("ERROR:",e)
+        elif appName=="power":
+            return self.kern.run_application(appName,appName,self.parent,self.kern)
         elif appName in self.kern.get_apps_name():#("settings","fileManager","wiki"):
             return self.kern.run_application(appName,appName,self.kern)
         elif "Q:(" in appName:

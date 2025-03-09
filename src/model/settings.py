@@ -80,9 +80,6 @@ class settings(App):
         self.grid.addWidget(sharing,4,2)
 
 
-
-
-
         home = qt.QWidget()
         home.setLayout(self.grid)
 
@@ -313,10 +310,6 @@ class settings(App):
         newName = qt.QLineEdit(self)
         newName.setPlaceholderText("Name...")
         newName.returnPressed.connect(lambda checked=False,e=newName: self.addUser(e))
-        #newName.setVisible(True)
-        #newName.resize(200,200)
-        #newName.setFixedSize(100,80)
-        #self.grid.addWidget(newName)
         self.b_lay.addWidget(newName)
 
     def addUser(self,widget):
@@ -347,20 +340,33 @@ class settings(App):
 
         if self.kern.get_current_user()!=self.kern.get_file_system().get_root():
             #self.getDash()
+            # Get two lists of fonts
+            self.kern.get_file_system().switch_to_user_home(self.kern.get_current_user())
+            self.kern.get_file_system().change_directory("Modules")
+            self.kern.get_file_system().change_directory("Config")
+            fontFile = self.kern.get_file_system().open_file("font.config")
+
+            curFont = fontFile.split(";")[0].split("=")[1].strip()
+            curSize = fontFile.split(";")[1].split("=")[1].strip()
+            print("The current font! ",curFont)
+            idx = 0
+            
+
             self.font_list = qt.QComboBox()
 
             self.grid.addWidget(self.font_list,1,2)
 
             fFam = [self.parent().font().styleName()]
-
+            curIdx = 0
             for f in qGui.QFontDatabase().families():
                 fFam.append(f)
-
-            #fFam = qGui.QFontDatabase.families()
-            #fFam = fontDb.families()
-
+                if curFont == f:
+                    idx = curIdx
+                curIdx += 1
+            
             #print(f"f-fam: {fFam}")
             self.font_list.addItems(fFam)
+            self.font_list.setCurrentIndex(idx+1)
             font_label = qt.QLabel("Fonts: ")
             self.grid.addWidget(font_label,1,1)
             #font_list.currentIndexChanged.connect(lambda checked=False,e=)
@@ -371,8 +377,16 @@ class settings(App):
             # Font size
             size_label = qt.QLabel("Font Size: ")
             self.grid.addWidget(size_label,1,3)
-            self.font_size = qt.QLineEdit()
-            self.font_size.setText("14")
+            self.font_size = qt.QComboBox()
+            fSizes = [f"{i}" for i in range(7,20)]
+            self.font_size.addItems(fSizes)
+            if curSize == "None":
+                curSize = "10"
+            if int(curSize) >= 7 and int(curSize)-1 < 20:
+                self.font_size.setCurrentIndex(fSizes.index(curSize))
+            else:
+                self.font_size.setCurrentIndex(10)
+            #self.font_size.setText(curSize)
             self.grid.addWidget(self.font_size,1,4)
 
         fontPage = qt.QWidget()
@@ -382,9 +396,10 @@ class settings(App):
     def changeFontUsingCurrent(self,currentFont):
         print("Current Font!!")
         font_name = self.font_list.currentText()
-        size = self.font_size.text().strip()
+        size = self.font_size.currentText().strip()
         #font = qGui.QFont(font_name,14)
         #self.setFont(font)
+
         if len(font_name) > 0 and len(size) > 0:
             try:
                 if len(size) == 0:

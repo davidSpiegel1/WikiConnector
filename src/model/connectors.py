@@ -149,7 +149,7 @@ class connectors(App):
 
         b_con = qt.QFrame()
         b_lay = qt.QVBoxLayout(b_con)
-        temp = ["wiki","Apple","WorldBank","Youtube"]
+        temp = ["wiki","apple","worldBank","youtube"]
         button_group = qt.QButtonGroup(scroll)
         for con in temp:
             b = qt.QCheckBox(con)#qt.QPushButton(con)
