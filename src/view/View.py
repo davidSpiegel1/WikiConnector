@@ -6,6 +6,7 @@ from controller import controller
 from model.Module import *
 import io
 import tkinter as tk
+import time
 """try:
     import screeninfo
 except ImportError:
@@ -132,7 +133,36 @@ class MainWindow(qt.QWidget):
         print("The userName: ",userName)
         try:
             self.kern.login(userName,passWord)
-            self.homeScreen()
+            #self.homeScreen()
+            # Trying to make a splash screen
+            self.clearLayout(self.layout)
+            self.splash = qt.QSplashScreen(qGui.QPixmap())
+            #self.splash.showMessage(f"Loading... ")
+
+
+            self.layout.addWidget(self.splash)
+            self.splash.raise_()
+            #splash.show()
+            # Add a progress bar to the splash screen
+            self.progress_bar = qt.QProgressBar(self.splash)
+            self.progress_bar.setGeometry(10, self.splash.height() - 30, self.splash.width() - 20, 20)
+            self.progress_bar.setRange(0, 100)
+            self.progress_bar.show()
+
+            self.t = qCore.QThread()
+            #t.started.connect(self.openHomeScreen)
+            #t.run = self.openHomeScreen
+            def thread_task():
+                #self.openHomeScreen()
+                self.homeScreen()
+            
+            self.t.started.connect(thread_task)
+            self.t.finished.connect(self.t.quit)
+            self.t.start()
+            #t.stop()
+            #t.finished.connect(t.quit)i
+            #self.homeScreen()
+
         except Exception as e:
             print("Error. Issues logging in.",e)
             print(traceback.format_exc())
@@ -140,6 +170,31 @@ class MainWindow(qt.QWidget):
             self.password.setStyleSheet("border: 3px solid red;")
             self.password.update()
             print("qss applied:",self.password.styleSheet())
+
+    def openHomeScreen(self):
+        #self.homeScreen()
+        # Trying to make a splash screen
+        """self.clearLayout(self.layout)
+        self.splash = qt.QSplashScreen(qGui.QPixmap())
+        #self.splash.showMessage(f"Loading... ")
+        self.layout.addWidget(self.splash)
+        self.splash.raise_()
+        #splash.show()
+        # Add a progress bar to the splash screen
+        self.progress_bar = qt.QProgressBar(self.splash)
+        self.progress_bar.setGeometry(10, self.splash.height() - 30, self.splash.width() - 20, 20)
+        self.progress_bar.setRange(0, 100)
+        self.progress_bar.show()"""
+
+
+        #time.sleep(1) # Simulating laoding time
+        self.splash.showMessage("Loading...")
+        time.sleep(1)
+        self.splash.close()
+        #self.homeScreen()
+        #while True:
+        #    print("HI")
+
 
     def clearLayout(self,layout):
         while layout.count():
@@ -151,6 +206,8 @@ class MainWindow(qt.QWidget):
         self.unlocked = value
 
     def homeScreen(self):
+
+        self.openHomeScreen()
         
         self.clearLayout(self.layout)
         self.mainTab = qt.QTabWidget()
