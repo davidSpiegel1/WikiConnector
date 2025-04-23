@@ -5,8 +5,7 @@ import subprocess
 import sys
 import os
 from install import *
-#os_name = platform.system()
-install = Install() 
+"""install = Install() 
 try:
     import PyQt5.QtWidgets as qt
     import PyQt5.QtCore as qCore
@@ -20,12 +19,12 @@ try:
 except ImportError:
     print("Error importing PIL")
     install.installPIL()
-"""try:
+try:
     import screeninfo
 except ImportError:
     print("Error importing screeninfo")
-    install.installScreenInfo()"""
-"""try:
+    install.installScreenInfo()
+try:
     import tkinter as tk
 except ImportError:
     print("Error importing tk")
