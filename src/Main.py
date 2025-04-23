@@ -5,8 +5,8 @@ import subprocess
 import sys
 import os
 from install import *
-"""install = Install() 
-try:
+install = Install() 
+"""try:
     import PyQt5.QtWidgets as qt
     import PyQt5.QtCore as qCore
     import PyQt5.QtGui as qGui

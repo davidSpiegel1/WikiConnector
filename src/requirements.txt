@@ -2,4 +2,4 @@ requests
 PyQt5
 Pillow
 screeninfo
-tk
+distro
