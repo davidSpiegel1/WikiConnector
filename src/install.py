@@ -10,18 +10,22 @@ class Install:
     def __init__(self):
         print("Installing tk for diffrent distros")
         name = distro.id()
-        if name in ("ubuntu","linuxmint"):
-            subprocess.check_call(["sudo","apt","install","python3-tk -y"])
-            print("tk installed on ubuntu")
-        if name == "arch":
-            subprocess.check_call(["sudo","pacman","-S","tk"])
-            print("tk installed on arch")
-        if name == "fedora":
-            subprocess.check_call(["sudo","dnf","install","python3-tkinter -y"])
-            print("tk installed on linuxmint")
-        else:
-            print("Not supported yet.")
-            #subprocess.check_call(["Python3","-m","pip","install","tk"])
+try:
+    import tk
+except ImportError:
+    print("Error installing tk")
+    if name in ("ubuntu","linuxmint"):
+        subprocess.check_call(["sudo","apt","install","python3-tk","-y"])
+        print("tk installed on ubuntu")
+    if name == "arch":
+        subprocess.check_call(["sudo","pacman","-S","tk"])
+        print("tk installed on arch")
+    if name == "fedora":
+        subprocess.check_call(["sudo","dnf","install","python3-tkinter","-y"])
+        print("tk installed on linuxmint")
+    else:
+        print("Not supported yet.")
+        #subprocess.check_call(["Python3","-m","pip","install","tk"])
             
 
             
