@@ -6,10 +6,7 @@ import sys
 import os
 import distro
 
-class Install:
-    def __init__(self):
-        print("Installing tk for diffrent distros")
-        name = distro.id()
+name = distro.id()
 try:
     import tk
 except ImportError:
@@ -27,6 +24,10 @@ except ImportError:
         print("Not supported yet.")
         #subprocess.check_call(["Python3","-m","pip","install","tk"])
             
+class Install:
+    def __init__(self):
+        print("Installing tk for diffrent distros")
+
 
             
 
