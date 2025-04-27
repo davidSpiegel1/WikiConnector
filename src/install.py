@@ -8,7 +8,7 @@ import distro
 
 name = distro.id()
 try:
-    import tk
+    import tkinter as tk
 except ImportError:
     print("Error installing tk")
     if name in ("ubuntu","linuxmint"):
@@ -19,7 +19,7 @@ except ImportError:
         print("tk installed on arch")
     if name == "fedora":
         subprocess.check_call(["sudo","dnf","install","python3-tkinter","-y"])
-        print("tk installed on linuxmint")
+        print("tk installed on fedora")
     else:
         print("Not supported yet.")
         #subprocess.check_call(["Python3","-m","pip","install","tk"])
