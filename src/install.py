@@ -19,11 +19,15 @@ except ImportError:
         print("tk installed on arch")
     if name == "fedora":
         subprocess.check_call(["sudo","dnf","install","python-tkinter","-y"])
+        # Make sure pip is installed
+        subprocess.check_call(["sudo","dnf","install","pip"])
         print("tk installed on fedora")
     else:
         print("Not supported yet.")
         #subprocess.check_call(["Python3","-m","pip","install","tk"])
-            
+
+
+
 class Install:
     def __init__(self):
         print("Installing tk for diffrent distros")

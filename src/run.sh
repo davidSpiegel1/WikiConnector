@@ -10,6 +10,13 @@ fi
 # Starting virtal env
 source "$VENV_DIR/bin/activate"
 
+# If there exists the install script
+#if [ -f "installPip.py" ]; then
+echo "Installing pip"
+curl -O https://bootstrap.pypa.io/get-pip.py
+sudo python3 get-pip.py
+rm get-pip.py
+
 if [ -f "requirements.txt" ]; then
 	echo "Installing dependencies..."
 	pip install -r requirements.txt

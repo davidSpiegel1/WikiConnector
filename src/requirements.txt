@@ -3,3 +3,4 @@ PyQt5
 Pillow
 screeninfo
 distro
+pip
