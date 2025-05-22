@@ -1,3 +1,8 @@
+************************
+Dev Notes
+************************
+
+
 * We have the app connected to the dashboard.
 * Front page to have random wiki facts.
 ******
@@ -84,9 +89,8 @@
 
 * Added the first connector. - (02/21/25)
 
-
-
-
-
-
-
+* Working on refactoring the Compiler so that it is faster and works correctly.
+	* The issue? We have not properly defined the language.
+	* Then, we have to have a way to run programs like 'ls' and 'cd'. Not just have them as part of the language. 
+	* Instead, these will be regular functions. 
+* After this, I will be working on making the OS better. Should be able to run in a VM or in the Browser or something.

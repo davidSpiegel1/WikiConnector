@@ -10,7 +10,7 @@ import importlib
 import traceback
 from model.OS.dbEngine import *
 from model.OS.notVim import *
-from model.OS.programTest import *
+#from model.OS.programTest import *
 from model.terminal import *
 from model.Module import *
 from view.View import *
@@ -423,10 +423,10 @@ class Kernel:
                 self.register_application("notVim",notVim)
             except Exception as e:
                 print("Error registering notvim",e)
-            try:
-                self.register_application("programTest",programTest)
-            except Exception as e:
-                print("Error registering programTest",e)
+            #try:
+            #    self.register_application("programTest",programTest)
+            #except Exception as e:
+            #    print("Error registering programTest",e)
 
     def register_lib_app(self,libs):
         self.libs = libs
